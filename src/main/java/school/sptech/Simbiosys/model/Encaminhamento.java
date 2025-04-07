@@ -16,7 +16,7 @@ public class Encaminhamento {
     private Integer encGeracaoRenda;
     private Integer encSaude;
     private Integer encTratamentoDrogas;
-    private Integer encProgramasTransferenciaRenda; // Exemplo: PTR
+    private Integer encProgramasTransferenciaRenda;
     private Integer encPoliticasPublicas;
 
     public Encaminhamento() {}

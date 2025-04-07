@@ -2,6 +2,7 @@ package school.sptech.Simbiosys.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import school.sptech.Simbiosys.exception.EntidadeJaExistente;
 import school.sptech.Simbiosys.exception.EntidadeNaoEncontradaException;
 import school.sptech.Simbiosys.model.Relatorio;
 import school.sptech.Simbiosys.repository.RelatorioRepository;
@@ -21,7 +22,7 @@ public class RelatorioService {
 
     public Relatorio cadastrar(Relatorio relatorio){
         if(repository.existsByMesAno(relatorio.getMesAno())){
-            throw new RuntimeException("Relatório com nome %s já cadastrado".formatted(relatorio.getMesAno()));
+            throw new EntidadeJaExistente("Relatório com nome %s já cadastrado".formatted(relatorio.getMesAno()));
         }
         return repository.save(relatorio);
     }
@@ -38,7 +39,6 @@ public class RelatorioService {
         );
     }
 
-
     public Relatorio atualizar(Integer id, Relatorio relatorioAtualizado) {
         Optional<Relatorio> relatorioExistenteOpt = repository.findById(id);
         if (relatorioExistenteOpt.isEmpty()) {
@@ -47,9 +47,12 @@ public class RelatorioService {
 
         Relatorio relatorioExistente = relatorioExistenteOpt.get();
 
-        if (repository.existsByMesAno(relatorioAtualizado.getMesAno()) &&
-                !relatorioAtualizado.getMesAno().equals(relatorioExistente.getMesAno())) {
-            throw new RuntimeException("Conflito de mes/ano");
+        if (repository.existsByMesAno(relatorioAtualizado.getMesAno())) {
+            throw new EntidadeJaExistente("Conflito de mes/ano");
+        }
+
+        if(!relatorioAtualizado.getMesAno().equals(relatorioExistente.getMesAno())){
+            throw new EntidadeNaoEncontradaException("Relatório não encontrado");
         }
 
         atualizarCamposNaoNulos(relatorioExistente, relatorioAtualizado);
