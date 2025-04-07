@@ -1,10 +1,15 @@
 package school.sptech.Simbiosys.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import school.sptech.Simbiosys.controller.dto.UsuarioRequestDto;
+import school.sptech.Simbiosys.controller.dto.UsuarioResponseDto;
 import school.sptech.Simbiosys.model.Usuario;
 import school.sptech.Simbiosys.repository.UsuarioRepository;
+import school.sptech.Simbiosys.service.AlterarSenhaDto;
+import school.sptech.Simbiosys.service.UsuarioService;
 
 import java.util.List;
 import java.util.Map;
@@ -15,159 +20,73 @@ import java.util.Optional;
 public class UsuarioController {
 
     @Autowired
-    private UsuarioRepository repository;
+    private UsuarioService usuarioService;
 
     @PostMapping
-    public ResponseEntity<?> cadastrar(@RequestBody Usuario usuario) {
-
-        if (usuario.getNome() == null || usuario.getNome().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body("O nome é obrigatório.");
+    public ResponseEntity<Usuario> cadastrarUsuario(@RequestBody UsuarioRequestDto dto) {
+        try {
+            Usuario usuarioCadastrado = usuarioService.cadastrarUsuario(dto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(usuarioCadastrado);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-
-        if (usuario.getEmail() == null || !usuario.getEmail().contains("@") || !usuario.getEmail().contains(".")) {
-            return ResponseEntity.badRequest().body("Email inválido.");
-        }
-
-        if (usuario.getSenha() == null || usuario.getSenha().length() < 6) {
-            return ResponseEntity.badRequest().body("A senha deve ter pelo menos 6 caracteres.");
-        }
-
-        if (repository.existsByEmailIgnoreCaseContaining(usuario.getEmail())) {
-            return ResponseEntity.status(409).body("Já existe um usuário cadastrado com este email.");
-        }
-
-        usuario.setId(null);
-        Usuario usuarioSalvo = repository.save(usuario);
-
-        return ResponseEntity.status(201).body(usuarioSalvo);
     }
 
     @GetMapping
     public ResponseEntity<List<Usuario>> listar() {
-
-        var usuarios = repository.findAll();
+        List<Usuario> usuarios = usuarioService.listarUsuarios();
         if (usuarios.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok().body(usuarios);
+        return ResponseEntity.ok(usuarios);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Usuario> buscarPorId(@PathVariable Integer id) {
-        if (id == null || id <= 0) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        Optional<Usuario> usuario = repository.findById(id);
-        return usuario.map(ResponseEntity::ok)
+        return usuarioService.buscarUsuarioPorId(id)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Integer id) {
-
-        if (id == null || id <= 0) {
-            return ResponseEntity.badRequest().build();
+        boolean deletado = usuarioService.deletarUsuario(id);
+        if (deletado) {
+            return ResponseEntity.noContent().build();
         }
-
-        if (!repository.existsById(id)) {
-            return ResponseEntity.notFound().build();
-        }
-
-        repository.deleteById(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.notFound().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> atualizar(
-            @PathVariable Integer id,
-            @RequestBody Usuario usuario
-    ) {
-
-        if (id == null || id <= 0) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        Optional<Usuario> usuarioExistenteOpt = repository.findById(id);
-        if (usuarioExistenteOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        Usuario usuarioExistente = usuarioExistenteOpt.get();
-
-        if (usuario.getNome() == null || usuario.getNome().trim().isEmpty()) {
-            return ResponseEntity.badRequest().body(null);
-        }
-        if (usuario.getEmail() == null || !usuario.getEmail().contains("@") || !usuario.getEmail().contains(".")) {
-            return ResponseEntity.badRequest().body(null);
-        }
-        if (usuario.getSenha() == null || usuario.getSenha().length() < 6) {
-            return ResponseEntity.badRequest().body(null);
-        }
-
-        usuarioExistente.setNome(usuario.getNome());
-        usuarioExistente.setEmail(usuario.getEmail());
-        usuarioExistente.setSenha(usuario.getSenha());
-
-        Usuario usuarioAtualizado = repository.save(usuarioExistente);
-
-        return ResponseEntity.ok(usuarioAtualizado);
+    public ResponseEntity<UsuarioResponseDto> atualizar(@PathVariable Integer id,
+                                                        @RequestBody UsuarioRequestDto dto) {
+        Optional<UsuarioResponseDto> atualizado = usuarioService.atualizarUsuario(id, dto);
+        return atualizado.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.badRequest().build());
     }
 
     @GetMapping("/filtro-nome")
     public ResponseEntity<List<Usuario>> buscarPorNome(@RequestParam String nome) {
-        if (nome == null || nome.trim().isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        List<Usuario> usuarios = repository.findByNomeContainingIgnoreCase(nome);
+        List<Usuario> usuarios = usuarioService.buscarPorNome(nome);
         if (usuarios.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-
         return ResponseEntity.ok(usuarios);
     }
 
     @GetMapping("/filtro-email")
-    public ResponseEntity<Usuario> buscarPorEmail(
-            @RequestParam String email) {
-
-        if (email == null || email.trim().isEmpty() || !email.contains("@")) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        Usuario usuario = repository.findByEmail(email);
-
+    public ResponseEntity<Usuario> buscarPorEmail(@RequestParam String email) {
+        Usuario usuario = usuarioService.buscarPorEmail(email);
         if (usuario == null) {
             return ResponseEntity.notFound().build();
         }
-
         return ResponseEntity.ok(usuario);
     }
 
     @PatchMapping("/{id}/alterar-senha")
-    public ResponseEntity<Void> alterarSenha(
-            @PathVariable Integer id, @RequestBody Map<String, String> senhaRequest
-    ) {
-        if (id == null || id <= 0) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        String novaSenha = senhaRequest.get("novaSenha");
-
-        if (novaSenha == null || novaSenha.length() < 6) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        Optional<Usuario> usuarioOpt = repository.findById(id);
-        if (usuarioOpt.isEmpty()) {
-            return ResponseEntity.notFound().build();
-        }
-
-        Usuario usuario = usuarioOpt.get();
-        usuario.setSenha(novaSenha);
-        repository.save(usuario);
-
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Void> alterarSenha(@PathVariable Integer id,
+                                             @RequestBody AlterarSenhaDto dto) {
+        boolean ok = usuarioService.alterarSenha(id, dto.getNovaSenha());
+        return ok ? ResponseEntity.noContent().build() : ResponseEntity.badRequest().build();
     }
 }
