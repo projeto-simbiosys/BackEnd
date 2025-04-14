@@ -14,7 +14,9 @@ public class Atividade {
     private Integer id;
     private String nome;
     private String descricao;
+    @Column(name = "dataInicio")
     private LocalDate dataInicio;
+    @Column(name = "dataFim")
     private LocalDate dataFim;
 
     public Integer getId() {
