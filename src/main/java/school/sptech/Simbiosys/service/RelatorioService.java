@@ -1,7 +1,9 @@
 package school.sptech.Simbiosys.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+import school.sptech.Simbiosys.event.RelatorioCriadoEvent;
 import school.sptech.Simbiosys.exception.EntidadeJaExistente;
 import school.sptech.Simbiosys.exception.EntidadeNaoEncontradaException;
 import school.sptech.Simbiosys.model.Relatorio;
@@ -15,6 +17,12 @@ public class RelatorioService {
 
     @Autowired
     private RelatorioRepository repository;
+    private final ApplicationEventPublisher publisher;
+
+    public RelatorioService(RelatorioRepository repository, ApplicationEventPublisher publisher) {
+        this.repository = repository;
+        this.publisher = publisher;
+    }
 
     public List<Relatorio> listar(){
         return repository.findAll();
@@ -24,7 +32,11 @@ public class RelatorioService {
         if(repository.existsByMesAno(relatorio.getMesAno())){
             throw new EntidadeJaExistente("Relatório com nome %s já cadastrado".formatted(relatorio.getMesAno()));
         }
-        return repository.save(relatorio);
+        Relatorio salvo = repository.save(relatorio);
+
+        publisher.publishEvent(new RelatorioCriadoEvent(this, salvo));
+
+        return salvo;
     }
 
     public Relatorio buscarPorId(Integer id) {
