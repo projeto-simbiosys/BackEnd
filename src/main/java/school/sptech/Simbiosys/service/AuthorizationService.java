@@ -5,17 +5,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import school.sptech.Simbiosys.repository.UserRepository;
+import school.sptech.Simbiosys.repository.UsuarioRepository;
 
 @Service
 public class AuthorizationService implements UserDetailsService {
 
     @Autowired
-    private UserRepository repository;
+    private UsuarioRepository repository;
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        return repository.findByLogin(username);
+        return repository.findByEmail(email);
     }
 }

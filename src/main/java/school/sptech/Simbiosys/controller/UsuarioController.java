@@ -7,12 +7,10 @@ import org.springframework.web.bind.annotation.*;
 import school.sptech.Simbiosys.controller.dto.UsuarioRequestDto;
 import school.sptech.Simbiosys.controller.dto.UsuarioResponseDto;
 import school.sptech.Simbiosys.model.Usuario;
-import school.sptech.Simbiosys.repository.UsuarioRepository;
 import school.sptech.Simbiosys.service.AlterarSenhaDto;
 import school.sptech.Simbiosys.service.UsuarioService;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @RestController

@@ -1,6 +1,5 @@
 package school.sptech.Simbiosys.controller.dto;
 
-import school.sptech.Simbiosys.model.Usuario;
 
 public class UsuarioRequestDto {
 
@@ -39,5 +38,14 @@ public class UsuarioRequestDto {
 
     public void setSenha(String senha) {
         this.senha = senha;
+    }
+
+    @Override
+    public String toString() {
+        return "UsuarioRequestDto{" +
+                "nome='" + nome + '\'' +
+                ", email='" + email + '\'' +
+                ", senha='" + senha + '\'' +
+                '}';
     }
 }

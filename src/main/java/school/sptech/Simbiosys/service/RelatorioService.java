@@ -24,7 +24,9 @@ public class RelatorioService {
         if(repository.existsByMesAno(relatorio.getMesAno())){
             throw new EntidadeJaExistente("Relatório com nome %s já cadastrado".formatted(relatorio.getMesAno()));
         }
-        return repository.save(relatorio);
+        relatorio.setId(null);
+        Relatorio relatorioSalvo = repository.save(relatorio);
+        return repository.save(relatorioSalvo);
     }
 
     public Relatorio buscarPorId(Integer id) {
@@ -33,10 +35,12 @@ public class RelatorioService {
     }
 
     public void deletar(Integer id){
+        if (!repository.existsById(id)) {
+            throw new EntidadeNaoEncontradaException(
+                    "Relatório com id %d não encontrado".formatted(id)
+            );
+        }
         repository.deleteById(id);
-        throw new EntidadeNaoEncontradaException(
-                "Produto de id: %d não encontrado".formatted(id)
-        );
     }
 
     public Relatorio atualizar(Integer id, Relatorio relatorioAtualizado) {

@@ -1,6 +1,7 @@
 package school.sptech.Simbiosys.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import school.sptech.Simbiosys.controller.dto.UsuarioRequestDto;
 import school.sptech.Simbiosys.controller.dto.UsuarioResponseDto;
@@ -18,6 +19,7 @@ public class UsuarioService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
 
     private List<Usuario> usuarios = new ArrayList<>();
 
@@ -43,10 +45,12 @@ public class UsuarioService {
             throw new UsuarioException("Já existe um usuário cadastrado com este email.");
         }
 
+
+        String encryptedPassword = new BCryptPasswordEncoder().encode(dto.getSenha());
         Usuario usuario = new Usuario();
         usuario.setNome(dto.getNome());
         usuario.setEmail(dto.getEmail());
-        usuario.setSenha(dto.getSenha());
+        usuario.setSenha(encryptedPassword);
 
         Usuario usuarioSalvo = usuarioRepository.save(usuario);
         usuarios.add(usuarioSalvo);
@@ -118,4 +122,5 @@ public class UsuarioService {
         usuarioRepository.save(usuario);
         return true;
     }
+
 }
