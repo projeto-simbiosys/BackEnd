@@ -1,27 +1,16 @@
 package school.sptech.Simbiosys.controller.dto;
 
+public class AuthenticationDto {
 
-public class UsuarioRequestDto {
-
-    private String nome;
     private String email;
     private String senha;
 
-    public UsuarioRequestDto() {
+    public AuthenticationDto() {
     }
 
-    public UsuarioRequestDto(String nome, String email, String senha) {
-        this.nome = nome;
+    public AuthenticationDto(String email, String senha) {
         this.email = email;
         this.senha = senha;
-    }
-
-    public String getNome() {
-        return nome;
-    }
-
-    public void setNome(String nome) {
-        this.nome = nome;
     }
 
     public String getEmail() {
@@ -42,9 +31,8 @@ public class UsuarioRequestDto {
 
     @Override
     public String toString() {
-        return "UsuarioRequestDto{" +
-                "nome='" + nome + '\'' +
-                ", email='" + email + '\'' +
+        return "AuthenticationDto{" +
+                "email='" + email + '\'' +
                 ", senha='" + senha + '\'' +
                 '}';
     }

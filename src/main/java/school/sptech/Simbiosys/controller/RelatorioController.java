@@ -3,6 +3,8 @@ package school.sptech.Simbiosys.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import school.sptech.Simbiosys.exception.DadosInvalidosException;
+import school.sptech.Simbiosys.exception.EntidadeJaExistente;
 import school.sptech.Simbiosys.exception.EntidadeNaoEncontradaException;
 import school.sptech.Simbiosys.model.Relatorio;
 import school.sptech.Simbiosys.repository.RelatorioRepository;
@@ -20,9 +22,14 @@ public class RelatorioController {
 
     @PostMapping
     public ResponseEntity<Relatorio> cadastrar (@RequestBody Relatorio relatorio) {
-
-        Relatorio relatorioSalvo = service.cadastrar(relatorio);
-        return ResponseEntity.status(201).body(relatorioSalvo);
+        try {
+            Relatorio relatorioSalvo = service.cadastrar(relatorio);
+            return ResponseEntity.status(201).body(relatorioSalvo);
+        } catch (DadosInvalidosException e) {
+            return ResponseEntity.status(400).build();
+        }catch (EntidadeJaExistente e) {
+            return ResponseEntity.status(409).build();
+        }
     }
 
     @GetMapping
@@ -36,14 +43,22 @@ public class RelatorioController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Relatorio> buscarPorId(@PathVariable Integer id) {
-       Relatorio relatorio = service.buscarPorId(id);
-        return ResponseEntity.ok(relatorio);
+        try {
+            Relatorio relatorio = service.buscarPorId(id);
+            return ResponseEntity.ok(relatorio);
+        } catch (EntidadeNaoEncontradaException ex) {
+            return ResponseEntity.status(404).build();
+        }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> remover(@PathVariable Integer id) {
-        service.deletar(id);
-        return ResponseEntity.status(204).build();
+        try {
+            service.deletar(id);
+            return ResponseEntity.status(204).build();
+        } catch (EntidadeNaoEncontradaException e) {
+            return ResponseEntity.status(404).build();
+        }
     }
 
     @PatchMapping("/{id}")
@@ -53,8 +68,10 @@ public class RelatorioController {
             return ResponseEntity.ok(relatorioSalvo);
         } catch (EntidadeNaoEncontradaException e) {
             return ResponseEntity.status(404).build();
-        } catch (RuntimeException e) {
+        } catch (EntidadeJaExistente e) {
             return ResponseEntity.status(409).build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(400).build();
         }
     }
 

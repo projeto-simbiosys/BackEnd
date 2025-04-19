@@ -6,18 +6,35 @@ import java.time.LocalDateTime;
 
 @Entity
 public class Relatorio {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    @Column(unique = true, nullable = false)
+
+    @Column(name = "mes_ano", unique = true, nullable = false)
     private String mesAno;
+
     private LocalDateTime dataAtualizacao;
-    @Embedded
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "fkencaminhamento")
     private Encaminhamento encaminhamento;
-    @Embedded
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "fkoutros_numeros")
     private OutrosNumeros outrosNumeros;
-    @Embedded
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "fkacoes_realizadas")
     private AcoesRealizadas acoesRealizadas;
+
+    @ManyToOne
+    @JoinColumn(name = "fk_usuario")
+    private Usuario usuario;
+
+    public Relatorio() {
+
+    }
 
     public Integer getId() {
         return id;
@@ -65,5 +82,13 @@ public class Relatorio {
 
     public void setAcoesRealizadas(AcoesRealizadas acoesRealizadas) {
         this.acoesRealizadas = acoesRealizadas;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
 }

@@ -1,9 +1,14 @@
 package school.sptech.Simbiosys.model;
 
-import jakarta.persistence.Embeddable;
+import jakarta.persistence.*;
 
-@Embeddable
+@Entity
 public class OutrosNumeros {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
+
     private Integer alimentacao;
     private Integer numeroDePessoasPresencial;
     private Integer cestasBasicasDoadas;
@@ -12,6 +17,14 @@ public class OutrosNumeros {
     private Integer totalParticipantesAtividadePresencial;
 
     public OutrosNumeros() {}
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public Integer getAlimentacao() {
         return alimentacao;
