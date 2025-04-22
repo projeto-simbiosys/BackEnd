@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/usuarios")
-@CrossOrigin(origins = "${cors.allowed.origins}")
+@CrossOrigin(origins = "${cors.allowed.origin}")
 public class UsuarioController {
 
     @Autowired
