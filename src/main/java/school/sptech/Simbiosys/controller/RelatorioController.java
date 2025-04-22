@@ -17,7 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/relatorios")
-@CrossOrigin(origins = "${cors.allowed.origins}")
+@CrossOrigin(origins = "${cors.allowed.origin}")
 public class RelatorioController {
 
     @Autowired
@@ -102,7 +102,7 @@ public class RelatorioController {
         return service.buscarRelatoriosPorPeriodo(de, para);
     }
 
-    @GetMapping("/ano/{ano}")
+    @GetMapping("/ano/exportar/{ano}")
     public ResponseEntity<byte[]> exportarPorAno(@PathVariable String ano) throws IOException {
         List<Relatorio> relatorios = service.buscarRelatoriosPorAno(ano);
         return gerarResponseExcel(relatorios, "relatorio_ano_" + ano);
@@ -114,7 +114,7 @@ public class RelatorioController {
         return gerarResponseExcel(relatorios, "relatorio_mes_" + mesAno.replace("/", "-"));
     }
 
-    @GetMapping("/periodo")
+    @GetMapping("/periodo/exportar")
     public ResponseEntity<byte[]> exportarPorPeriodo(
             @RequestParam String de,
             @RequestParam String para) throws IOException {

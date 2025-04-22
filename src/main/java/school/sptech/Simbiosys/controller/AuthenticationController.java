@@ -13,7 +13,7 @@ import school.sptech.Simbiosys.model.Usuario;
 
 @RestController
 @RequestMapping("auth")
-@CrossOrigin(origins = "${cors.allowed.origins}")
+@CrossOrigin(origins = "${cors.allowed.origin}")
 public class AuthenticationController {
 
     @Autowired
