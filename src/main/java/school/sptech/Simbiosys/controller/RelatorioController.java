@@ -17,6 +17,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/relatorios")
+@CrossOrigin(origins = "${cors.allowed.origins}")
 public class RelatorioController {
 
     @Autowired
