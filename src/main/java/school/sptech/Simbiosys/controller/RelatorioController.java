@@ -1,5 +1,6 @@
 package school.sptech.Simbiosys.controller;
 
+import adapter.RelatorioExcelAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,7 @@ import school.sptech.Simbiosys.model.Relatorio;
 import school.sptech.Simbiosys.repository.RelatorioRepository;
 import school.sptech.Simbiosys.service.RelatorioService;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -83,6 +85,48 @@ public class RelatorioController {
         } catch (EntidadeNaoEncontradaException e) {
             return ResponseEntity.status(404).build();
         }
+    }
+
+    @GetMapping("/ano/{ano}")
+    public List<Relatorio> getRelatoriosPorAno(@PathVariable String ano) {
+        return service.buscarRelatoriosPorAno(ano);
+    }
+
+    // /relatorios/periodo?de=01/2024&para=04/2024
+    @GetMapping("/periodo")
+    public List<Relatorio> getRelatoriosPorPeriodo(
+            @RequestParam String de,
+            @RequestParam String para
+    ) {
+        return service.buscarRelatoriosPorPeriodo(de, para);
+    }
+
+    @GetMapping("/ano/{ano}")
+    public ResponseEntity<byte[]> exportarPorAno(@PathVariable String ano) throws IOException {
+        List<Relatorio> relatorios = service.buscarRelatoriosPorAno(ano);
+        return gerarResponseExcel(relatorios, "relatorio_ano_" + ano);
+    }
+
+    @GetMapping("/mes")
+    public ResponseEntity<byte[]> exportarPorMes(@RequestParam String mesAno) throws IOException {
+        List<Relatorio> relatorios = service.buscarRelatoriosPorPeriodo(mesAno, mesAno);
+        return gerarResponseExcel(relatorios, "relatorio_mes_" + mesAno.replace("/", "-"));
+    }
+
+    @GetMapping("/periodo")
+    public ResponseEntity<byte[]> exportarPorPeriodo(
+            @RequestParam String de,
+            @RequestParam String para) throws IOException {
+        List<Relatorio> relatorios = service.buscarRelatoriosPorPeriodo(de, para);
+        return gerarResponseExcel(relatorios, "relatorio_de_" + de + "_para_" + para);
+    }
+
+    private ResponseEntity<byte[]> gerarResponseExcel(List<Relatorio> relatorios, String nomeArquivo) throws IOException {
+        byte[] excel = RelatorioExcelAdapter.exportarParaExcel(relatorios);
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=" + nomeArquivo + ".xlsx")
+                .header("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                .body(excel);
     }
 
 }

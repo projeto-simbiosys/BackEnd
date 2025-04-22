@@ -85,5 +85,13 @@ public class RelatorioService {
         }
         return repository.findByMesAno(mesAno);
     }
+
+    public List<Relatorio> buscarRelatoriosPorAno(String ano) {
+        return repository.findByAno(ano);
+    }
+
+    public List<Relatorio> buscarRelatoriosPorPeriodo(String de, String para) {
+        return repository.findByPeriodo(de, para);
+    }
 }
 
