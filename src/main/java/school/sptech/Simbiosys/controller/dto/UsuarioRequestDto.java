@@ -4,16 +4,33 @@ package school.sptech.Simbiosys.controller.dto;
 public class UsuarioRequestDto {
 
     private String nome;
+    private String sobrenome;
+    private String cargo;
     private String email;
     private String senha;
 
-    public UsuarioRequestDto() {
-    }
-
-    public UsuarioRequestDto(String nome, String email, String senha) {
+    public UsuarioRequestDto(String nome, String sobrenome, String cargo, String email, String senha) {
         this.nome = nome;
+        this.sobrenome = sobrenome;
+        this.cargo = cargo;
         this.email = email;
         this.senha = senha;
+    }
+
+    public String getSobrenome() {
+        return sobrenome;
+    }
+
+    public void setSobrenome(String sobrenome) {
+        this.sobrenome = sobrenome;
+    }
+
+    public String getCargo() {
+        return cargo;
+    }
+
+    public void setCargo(String cargo) {
+        this.cargo = cargo;
     }
 
     public String getNome() {

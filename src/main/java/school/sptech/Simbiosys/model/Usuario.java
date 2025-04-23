@@ -13,17 +13,37 @@ public class Usuario implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String nome;
+    private String sobrenome;
+    private String cargo;
     private String email;
     private String senha;
 
     public Usuario() {
     }
 
-    public Usuario(Integer id, String nome, String email, String senha) {
+    public Usuario(Integer id, String nome, String sobrenome, String cargo, String email, String senha) {
         this.id = id;
         this.nome = nome;
+        this.sobrenome = sobrenome;
+        this.cargo = cargo;
         this.email = email;
         this.senha = senha;
+    }
+
+    public String getSobrenome() {
+        return sobrenome;
+    }
+
+    public void setSobrenome(String sobrenome) {
+        this.sobrenome = sobrenome;
+    }
+
+    public String getCargo() {
+        return cargo;
+    }
+
+    public void setCargo(String cargo) {
+        this.cargo = cargo;
     }
 
     public Integer getId() {

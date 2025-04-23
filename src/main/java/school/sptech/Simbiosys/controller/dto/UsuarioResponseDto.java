@@ -12,12 +12,32 @@ public class UsuarioResponseDto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String nome;
+    private String sobrenome;
+    private String cargo;
     private String email;
 
     public UsuarioResponseDto(Usuario usuario) {
         this.id = usuario.getId();
         this.nome = usuario.getNome();
+        this.sobrenome = usuario.getSobrenome();
+        this.cargo = usuario.getCargo();
         this.email = usuario.getEmail();
+    }
+
+    public String getSobrenome() {
+        return sobrenome;
+    }
+
+    public void setSobrenome(String sobrenome) {
+        this.sobrenome = sobrenome;
+    }
+
+    public String getCargo() {
+        return cargo;
+    }
+
+    public void setCargo(String cargo) {
+        this.cargo = cargo;
     }
 
     public Integer getId() {
