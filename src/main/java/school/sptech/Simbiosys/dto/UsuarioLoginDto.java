@@ -1,4 +1,4 @@
-package school.sptech.Simbiosys.controller.dto;
+package school.sptech.Simbiosys.dto;
 
 public class UsuarioLoginDto {
 

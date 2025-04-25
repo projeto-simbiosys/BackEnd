@@ -1,9 +1,7 @@
-package school.sptech.Simbiosys.controller.dto;
+package school.sptech.Simbiosys.dto;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import school.sptech.Simbiosys.model.Usuario;
-
-import java.util.Optional;
 
 public class UsuarioMapper {
     public static Usuario of(UsuarioRequestDto usuarioCriacaoDto) {

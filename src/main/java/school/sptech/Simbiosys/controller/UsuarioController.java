@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import school.sptech.Simbiosys.controller.dto.*;
+import school.sptech.Simbiosys.dto.*;
 import school.sptech.Simbiosys.model.Usuario;
 import school.sptech.Simbiosys.service.AlterarSenhaDto;
 import school.sptech.Simbiosys.service.UsuarioService;
@@ -21,10 +21,10 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @PostMapping
-    public ResponseEntity<Usuario> cadastrarUsuario(@RequestBody UsuarioRequestDto dto) {
+    public ResponseEntity<UsuarioResponseDto> cadastrarUsuario(@RequestBody UsuarioRequestDto dto) {
         try {
             Usuario usuarioCadastrado = usuarioService.cadastrarUsuario(dto);
-            return ResponseEntity.status(HttpStatus.CREATED).body(usuarioCadastrado);
+            return ResponseEntity.status(HttpStatus.CREATED).body(UsuarioMapper.of(usuarioCadastrado));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }

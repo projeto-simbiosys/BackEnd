@@ -1,4 +1,4 @@
-package school.sptech.Simbiosys.controller.dto;
+package school.sptech.Simbiosys.dto;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
