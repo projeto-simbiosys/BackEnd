@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import school.sptech.Simbiosys.controller.dto.UsuarioDetalhesDto;
+import school.sptech.Simbiosys.dto.UsuarioDetalhesDto;
 import school.sptech.Simbiosys.model.Usuario;
 import school.sptech.Simbiosys.repository.UsuarioRepository;
 
