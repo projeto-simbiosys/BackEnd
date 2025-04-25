@@ -24,6 +24,10 @@ public class UsuarioResponseDto {
         this.email = usuario.getEmail();
     }
 
+    public UsuarioResponseDto() {
+
+    }
+
     public String getSobrenome() {
         return sobrenome;
     }

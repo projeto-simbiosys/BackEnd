@@ -6,10 +6,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import school.sptech.Simbiosys.model.Usuario;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
 
-    Usuario findByEmail(String email);
+    Optional<Usuario> findByEmail(String email);
 
     boolean existsByEmailIgnoreCaseContaining(String email);
 

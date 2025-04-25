@@ -4,8 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import school.sptech.Simbiosys.controller.dto.UsuarioRequestDto;
-import school.sptech.Simbiosys.controller.dto.UsuarioResponseDto;
+import school.sptech.Simbiosys.controller.dto.*;
 import school.sptech.Simbiosys.model.Usuario;
 import school.sptech.Simbiosys.service.AlterarSenhaDto;
 import school.sptech.Simbiosys.service.UsuarioService;
@@ -31,9 +30,18 @@ public class UsuarioController {
         }
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<UsuarioTokenDto> login(@RequestBody UsuarioLoginDto usuarioLoginDto) {
+
+        final Usuario usuario = UsuarioMapper.of(usuarioLoginDto);
+        UsuarioTokenDto usuarioTokenDto = this.usuarioService.autenticar(usuario);
+
+        return ResponseEntity.status(200).body(usuarioTokenDto);
+    }
+
     @GetMapping
-    public ResponseEntity<List<Usuario>> listar() {
-        List<Usuario> usuarios = usuarioService.listarUsuarios();
+    public ResponseEntity<List<UsuarioResponseDto>> listar() {
+        List<UsuarioResponseDto> usuarios = usuarioService.listarUsuarios();
         if (usuarios.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
@@ -41,7 +49,7 @@ public class UsuarioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Usuario> buscarPorId(@PathVariable Integer id) {
+    public ResponseEntity<UsuarioResponseDto> buscarPorId(@PathVariable Integer id) {
         return usuarioService.buscarUsuarioPorId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -65,8 +73,8 @@ public class UsuarioController {
     }
 
     @GetMapping("/filtro-nome")
-    public ResponseEntity<List<Usuario>> buscarPorNome(@RequestParam String nome) {
-        List<Usuario> usuarios = usuarioService.buscarPorNome(nome);
+    public ResponseEntity<List<UsuarioResponseDto>> buscarPorNome(@RequestParam String nome) {
+        List<UsuarioResponseDto> usuarios = usuarioService.buscarPorNome(nome);
         if (usuarios.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
@@ -74,8 +82,8 @@ public class UsuarioController {
     }
 
     @GetMapping("/filtro-email")
-    public ResponseEntity<Usuario> buscarPorEmail(@RequestParam String email) {
-        Usuario usuario = usuarioService.buscarPorEmail(email);
+    public ResponseEntity<Optional<UsuarioResponseDto>> buscarPorEmail(@RequestParam String email) {
+        Optional<UsuarioResponseDto> usuario = usuarioService.buscarPorEmail(email);
         if (usuario == null) {
             return ResponseEntity.notFound().build();
         }

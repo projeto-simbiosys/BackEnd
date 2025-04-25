@@ -1,10 +1,18 @@
 package school.sptech.Simbiosys.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import school.sptech.Simbiosys.config.GerenciadorTokenJwt;
+import school.sptech.Simbiosys.controller.dto.UsuarioMapper;
 import school.sptech.Simbiosys.controller.dto.UsuarioRequestDto;
 import school.sptech.Simbiosys.controller.dto.UsuarioResponseDto;
+import school.sptech.Simbiosys.controller.dto.UsuarioTokenDto;
 import school.sptech.Simbiosys.exception.UsuarioException;
 import school.sptech.Simbiosys.model.Usuario;
 import school.sptech.Simbiosys.repository.UsuarioRepository;
@@ -18,13 +26,23 @@ import java.util.Optional;
 public class UsuarioService {
 
     @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private GerenciadorTokenJwt gerenciadorTokenJwt;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
 
     private List<Usuario> usuarios = new ArrayList<>();
 
-    public List<Usuario> listarUsuarios() {
-        return usuarioRepository.findAll();
+    public List<UsuarioResponseDto> listarUsuarios() {
+        List<Usuario> usuariosEncontrados = usuarioRepository.findAll();
+        return usuariosEncontrados.stream().map(UsuarioMapper::of).toList();
     }
 
     public Usuario cadastrarUsuario(UsuarioRequestDto dto) {
@@ -46,23 +64,38 @@ public class UsuarioService {
         }
 
 
-        String encryptedPassword = new BCryptPasswordEncoder().encode(dto.getSenha());
-        Usuario usuario = new Usuario();
-        usuario.setNome(dto.getNome());
-        usuario.setEmail(dto.getEmail());
-        usuario.setSenha(encryptedPassword);
-
-        Usuario usuarioSalvo = usuarioRepository.save(usuario);
+        Usuario usuarioSalvo = usuarioRepository.save(UsuarioMapper.of(dto));
         usuarios.add(usuarioSalvo);
 
         return usuarioSalvo;
     }
 
-    public Optional<Usuario> buscarUsuarioPorId(Integer id) {
+    public UsuarioTokenDto autenticar(Usuario usuario) {
+        System.out.println("SENHA RECEBIDA: " + usuario.getSenha());
+        final UsernamePasswordAuthenticationToken credentials = new UsernamePasswordAuthenticationToken(
+                usuario.getEmail(), usuario.getSenha());
+
+        final Authentication authentication = this.authenticationManager.authenticate(credentials);
+
+        Usuario usuarioAutenticado =
+                usuarioRepository.findByEmail(usuario.getEmail())
+                        .orElseThrow(
+                                () -> new ResponseStatusException(404, "Email do usuário não cadastrado", null)
+                        );
+
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        final String token = gerenciadorTokenJwt.generateToken(authentication);
+
+        return UsuarioMapper.of(usuarioAutenticado, token);
+    }
+
+    public Optional<UsuarioResponseDto> buscarUsuarioPorId(Integer id) {
         if (id == null || id <= 0) {
             return Optional.empty();
         }
-        return usuarioRepository.findById(id);
+        return usuarioRepository.findById(id)
+                .map(UsuarioMapper::of);
     }
 
     public boolean deletarUsuario(Integer id) {
@@ -86,6 +119,8 @@ public class UsuarioService {
         }
         Usuario usuario = usuarioOpt.get();
         usuario.setNome(dto.getNome());
+        usuario.setSobrenome(dto.getSobrenome());
+        usuario.setCargo(dto.getCargo());
         usuario.setEmail(dto.getEmail());
         usuario.setSenha(dto.getSenha());
 
@@ -93,18 +128,20 @@ public class UsuarioService {
         return Optional.of(new UsuarioResponseDto(salvo));
     }
 
-    public List<Usuario> buscarPorNome(String nome) {
+    public List<UsuarioResponseDto> buscarPorNome(String nome) {
         if (nome == null || nome.trim().isEmpty()) {
             return Collections.emptyList();
         }
-        return usuarioRepository.findByNomeContainingIgnoreCase(nome);
+        List<Usuario> usuariosEncontrados = usuarioRepository.findByNomeContainingIgnoreCase(nome);
+        return usuariosEncontrados.stream().map(UsuarioMapper::of).toList();
     }
 
-    public Usuario buscarPorEmail(String email) {
+    public Optional<UsuarioResponseDto> buscarPorEmail(String email) {
         if (email == null || email.trim().isEmpty() || !email.contains("@")) {
             return null;
         }
-        return usuarioRepository.findByEmail(email);
+        return usuarioRepository.findByEmail(email)
+                .map(UsuarioMapper::of);
     }
 
     public boolean alterarSenha(Integer id, String novaSenha) {
