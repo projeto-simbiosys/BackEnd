@@ -73,4 +73,21 @@ public class OutrosNumeros {
     public void setTotalParticipantesAtividadePresencial(Integer totalParticipantesAtividadePresencial) {
         this.totalParticipantesAtividadePresencial = totalParticipantesAtividadePresencial;
     }
+
+    public void somar(OutrosNumeros outro) {
+        if (outro == null) return;
+
+        this.alimentacao = safeSum(this.alimentacao, outro.getAlimentacao());
+        this.numeroDePessoasPresencial = safeSum(this.numeroDePessoasPresencial, outro.getNumeroDePessoasPresencial());
+        this.cestasBasicasDoadas = safeSum(this.cestasBasicasDoadas, outro.getCestasBasicasDoadas());
+        this.kitsHigieneDoados = safeSum(this.kitsHigieneDoados, outro.getKitsHigieneDoados());
+        this.totalParticipantesAtividadeDistancia = safeSum(this.totalParticipantesAtividadeDistancia, outro.getTotalParticipantesAtividadeDistancia());
+        this.totalParticipantesAtividadePresencial = safeSum(this.totalParticipantesAtividadePresencial, outro.getTotalParticipantesAtividadePresencial());
+    }
+
+    private Integer safeSum(Integer a, Integer b) {
+        int safeA = (a != null) ? a : 0;
+        int safeB = (b != null) ? b : 0;
+        return safeA + safeB;
+    }
 }

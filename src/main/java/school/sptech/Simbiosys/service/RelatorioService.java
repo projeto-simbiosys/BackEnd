@@ -6,9 +6,15 @@ import org.springframework.stereotype.Service;
 import school.sptech.Simbiosys.event.RelatorioCriadoEvent;
 import school.sptech.Simbiosys.exception.EntidadeJaExistente;
 import school.sptech.Simbiosys.exception.EntidadeNaoEncontradaException;
+import school.sptech.Simbiosys.exception.RelatorioNaoEncontradoException;
+import school.sptech.Simbiosys.model.AcoesRealizadas;
+import school.sptech.Simbiosys.model.Encaminhamento;
+import school.sptech.Simbiosys.model.OutrosNumeros;
 import school.sptech.Simbiosys.model.Relatorio;
 import school.sptech.Simbiosys.repository.RelatorioRepository;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -84,6 +90,64 @@ public class RelatorioService {
             throw new EntidadeNaoEncontradaException("Relatório com mes/ano: %s não encontrado".formatted(mesAno));
         }
         return repository.findByMesAno(mesAno);
+    }
+
+    public Relatorio somarRelatoriosPorAno(String ano) {
+        List<Relatorio> relatorios = repository.findByAno(ano);
+
+        if (relatorios.isEmpty()) {
+            return null;
+        }
+
+        Relatorio relatorioSomado = new Relatorio();
+        relatorioSomado.setMesAno("Ano " + ano);
+        relatorioSomado.setDataAtualizacao(LocalDateTime.now());
+        relatorioSomado.setUsuario(null);
+        Encaminhamento encaminhamentoTotal = new Encaminhamento();
+        OutrosNumeros outrosNumerosTotal = new OutrosNumeros();
+        AcoesRealizadas acoesRealizadasTotal = new AcoesRealizadas();
+
+        for (Relatorio r : relatorios) {
+            Encaminhamento e = r.getEncaminhamento();
+            if (e != null) {
+                encaminhamentoTotal.somar(e);
+            }
+
+            OutrosNumeros o = r.getOutrosNumeros();
+            if (o != null) {
+                outrosNumerosTotal.somar(o);
+            }
+
+            AcoesRealizadas a = r.getAcoesRealizadas();
+            if (a != null) {
+                acoesRealizadasTotal.somar(a);
+            }
+        }
+
+        relatorioSomado.setEncaminhamento(encaminhamentoTotal);
+        relatorioSomado.setOutrosNumeros(outrosNumerosTotal);
+        relatorioSomado.setAcoesRealizadas(acoesRealizadasTotal);
+
+        return relatorioSomado;
+    }
+
+    public Relatorio somarRelatoriosPorPeriodo(String de, String para) {
+        List<Relatorio> relatorios = repository.findByPeriodo(de, para);
+
+        System.out.println("Relatórios encontrados: " + relatorios.size());
+
+        if (relatorios.isEmpty()) {
+            throw new RelatorioNaoEncontradoException("Nenhum relatório encontrado para o período de " + de + " até " + para);
+        }
+
+        Relatorio relatorioSomado = new Relatorio();
+        relatorioSomado.setMesAno(de + " até " + para);
+
+        for (Relatorio r : relatorios) {
+            relatorioSomado.somar(r);
+        }
+
+        return relatorioSomado;
     }
 
     public List<Relatorio> buscarRelatoriosPorAno(String ano) {

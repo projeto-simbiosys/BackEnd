@@ -145,4 +145,29 @@ public class Encaminhamento {
     public void setEncPoliticasPublicas(Integer encPoliticasPublicas) {
         this.encPoliticasPublicas = encPoliticasPublicas;
     }
+
+    public void somar(Encaminhamento outro) {
+        if (outro == null) return;
+
+        this.encBeneficioPrestacaoContinuada = safeSum(this.encBeneficioPrestacaoContinuada, outro.getEncBeneficioPrestacaoContinuada());
+        this.encAposentadoria = safeSum(this.encAposentadoria, outro.getEncAposentadoria());
+        this.encAssistenciaSocial = safeSum(this.encAssistenciaSocial, outro.getEncAssistenciaSocial());
+        this.encCursosProfissionalizantesForaOrganizacao = safeSum(this.encCursosProfissionalizantesForaOrganizacao, outro.getEncCursosProfissionalizantesForaOrganizacao());
+        this.encCursosProfissionalizantesDentroOrganizacao = safeSum(this.encCursosProfissionalizantesDentroOrganizacao, outro.getEncCursosProfissionalizantesDentroOrganizacao());
+        this.encEducacaoNaoFormal = safeSum(this.encEducacaoNaoFormal, outro.getEncEducacaoNaoFormal());
+        this.encEducacaoFormal = safeSum(this.encEducacaoFormal, outro.getEncEducacaoFormal());
+        this.encDocumentos = safeSum(this.encDocumentos, outro.getEncDocumentos());
+        this.encTrabalho = safeSum(this.encTrabalho, outro.getEncTrabalho());
+        this.encGeracaoRenda = safeSum(this.encGeracaoRenda, outro.getEncGeracaoRenda());
+        this.encSaude = safeSum(this.encSaude, outro.getEncSaude());
+        this.encTratamentoDrogas = safeSum(this.encTratamentoDrogas, outro.getEncTratamentoDrogas());
+        this.encProgramasTransferenciaRenda = safeSum(this.encProgramasTransferenciaRenda, outro.getEncProgramasTransferenciaRenda());
+        this.encPoliticasPublicas = safeSum(this.encPoliticasPublicas, outro.getEncPoliticasPublicas());
+    }
+
+    private Integer safeSum(Integer a, Integer b) {
+        int safeA = (a != null) ? a : 0;
+        int safeB = (b != null) ? b : 0;
+        return safeA + safeB;
+    }
 }

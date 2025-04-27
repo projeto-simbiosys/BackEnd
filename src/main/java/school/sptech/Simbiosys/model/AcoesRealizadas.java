@@ -159,5 +159,31 @@ public class AcoesRealizadas {
     public void setTotalPessoasCursosProfissionalizantesVirtuais(Integer totalPessoasCursosProfissionalizantesVirtuais) {
         this.totalPessoasCursosProfissionalizantesVirtuais = totalPessoasCursosProfissionalizantesVirtuais;
     }
+
+    public void somar(AcoesRealizadas outro) {
+        if (outro == null) return;
+
+        this.totalAtividadesGrupoVirtual = safeSum(this.totalAtividadesGrupoVirtual, outro.getTotalAtividadesGrupoVirtual());
+        this.totalAtividadesCulturaisExternas = safeSum(this.totalAtividadesCulturaisExternas, outro.getTotalAtividadesCulturaisExternas());
+        this.totalAtividadesCulturaisVirtuais = safeSum(this.totalAtividadesCulturaisVirtuais, outro.getTotalAtividadesCulturaisVirtuais());
+        this.totalPalestrasPresenciais = safeSum(this.totalPalestrasPresenciais, outro.getTotalPalestrasPresenciais());
+        this.totalPalestrasVirtuais = safeSum(this.totalPalestrasVirtuais, outro.getTotalPalestrasVirtuais());
+        this.totalVisitasFamiliaresPresenciais = safeSum(this.totalVisitasFamiliaresPresenciais, outro.getTotalVisitasFamiliaresPresenciais());
+        this.totalVisitasFamiliaresVirtuais = safeSum(this.totalVisitasFamiliaresVirtuais, outro.getTotalVisitasFamiliaresVirtuais());
+        this.totalVisitasMonitoradasPresenciais = safeSum(this.totalVisitasMonitoradasPresenciais, outro.getTotalVisitasMonitoradasPresenciais());
+        this.totalVisitasMonitoradasVirtuais = safeSum(this.totalVisitasMonitoradasVirtuais, outro.getTotalVisitasMonitoradasVirtuais());
+        this.totalCursosMinistradosPresenciais = safeSum(this.totalCursosMinistradosPresenciais, outro.getTotalCursosMinistradosPresenciais());
+        this.totalCursosMinistradosVirtuais = safeSum(this.totalCursosMinistradosVirtuais, outro.getTotalCursosMinistradosVirtuais());
+        this.totalPessoasCursosCapacitacaoPresenciais = safeSum(this.totalPessoasCursosCapacitacaoPresenciais, outro.getTotalPessoasCursosCapacitacaoPresenciais());
+        this.totalPessoasCursosCapacitacaoVirtuais = safeSum(this.totalPessoasCursosCapacitacaoVirtuais, outro.getTotalPessoasCursosCapacitacaoVirtuais());
+        this.totalPessoasCursosProfissionalizantesPresenciais = safeSum(this.totalPessoasCursosProfissionalizantesPresenciais, outro.getTotalPessoasCursosProfissionalizantesPresenciais());
+        this.totalPessoasCursosProfissionalizantesVirtuais = safeSum(this.totalPessoasCursosProfissionalizantesVirtuais, outro.getTotalPessoasCursosProfissionalizantesVirtuais());
+    }
+
+    private Integer safeSum(Integer a, Integer b) {
+        int safeA = (a != null) ? a : 0;
+        int safeB = (b != null) ? b : 0;
+        return safeA + safeB;
+    }
 }
 

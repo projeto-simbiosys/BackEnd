@@ -91,4 +91,29 @@ public class Relatorio {
     public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
+
+    public void somar(Relatorio outro) {
+        if (outro == null) return;
+
+        if (this.encaminhamento == null) {
+            this.encaminhamento = new Encaminhamento();
+        }
+        if (outro.getEncaminhamento() != null) {
+            this.encaminhamento.somar(outro.getEncaminhamento());
+        }
+
+        if (this.outrosNumeros == null) {
+            this.outrosNumeros = new OutrosNumeros();
+        }
+        if (outro.getOutrosNumeros() != null) {
+            this.outrosNumeros.somar(outro.getOutrosNumeros());
+        }
+
+        if (this.acoesRealizadas == null) {
+            this.acoesRealizadas = new AcoesRealizadas();
+        }
+        if (outro.getAcoesRealizadas() != null) {
+            this.acoesRealizadas.somar(outro.getAcoesRealizadas());
+        }
+    }
 }

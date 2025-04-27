@@ -17,6 +17,6 @@ public interface RelatorioRepository extends JpaRepository<Relatorio, Integer> {
     @Query("SELECT r FROM Relatorio r WHERE r.mesAno LIKE %:ano%")
     List<Relatorio> findByAno(@Param("ano") String ano);
 
-    @Query("SELECT r FROM Relatorio r WHERE STR_TO_DATE(r.mesAno, '%m/%Y') BETWEEN STR_TO_DATE(:de, '%m/%Y') AND STR_TO_DATE(:para, '%m/%Y')")
+    @Query("SELECT r FROM Relatorio r WHERE r.mesAno >= :de AND r.mesAno <= :para")
     List<Relatorio> findByPeriodo(@Param("de") String de, @Param("para") String para);
 }

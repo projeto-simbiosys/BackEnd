@@ -62,7 +62,10 @@ public class SecurityConfiguracao {
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .cors(Customizer.withDefaults())
                 .csrf(CsrfConfigurer<HttpSecurity>::disable)
-                .authorizeHttpRequests(authorize -> authorize.requestMatchers(URLS_PERMITIDAS)
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(URLS_PERMITIDAS)
+                        .permitAll()
+                        .requestMatchers("/relatorios/download/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated()
