@@ -16,6 +16,9 @@ public class Relatorio {
 
     private LocalDateTime dataAtualizacao;
 
+    @Column(name = "aberto")
+    private Boolean aberto = true;
+
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "fkencaminhamento")
     private Encaminhamento encaminhamento;
@@ -34,6 +37,14 @@ public class Relatorio {
 
     public Relatorio() {
 
+    }
+
+    public Boolean getAberto() {
+        return aberto;
+    }
+
+    public void setAberto(Boolean aberto) {
+        this.aberto = aberto;
     }
 
     public Integer getId() {
