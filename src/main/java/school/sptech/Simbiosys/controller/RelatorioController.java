@@ -41,12 +41,13 @@ public class RelatorioController {
         }
     }
 
-    @GetMapping
-    public ResponseEntity<List<Relatorio>> listar() {
-        List<Relatorio> relatorios = service.listar();
+    @GetMapping("/ano/{ano}/listar")
+    public ResponseEntity<List<Relatorio>> listar(@PathVariable String ano) {
+        List<Relatorio> relatorios = service.buscarRelatoriosPorAno(ano);
         if (relatorios.isEmpty()) {
-            return ResponseEntity.status(204).build();
+            return ResponseEntity.noContent().build();
         }
+
         return ResponseEntity.ok(relatorios);
     }
 

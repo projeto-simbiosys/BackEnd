@@ -30,10 +30,6 @@ public class RelatorioService {
         this.publisher = publisher;
     }
 
-    public List<Relatorio> listar(){
-        return repository.findAll();
-    }
-
     public Relatorio cadastrar(Relatorio relatorio){
         if(repository.existsByMesAno(relatorio.getMesAno())){
             throw new EntidadeJaExistente("Relatório com nome %s já cadastrado".formatted(relatorio.getMesAno()));
