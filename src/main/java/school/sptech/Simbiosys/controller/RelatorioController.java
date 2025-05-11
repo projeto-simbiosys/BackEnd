@@ -72,17 +72,9 @@ public class RelatorioController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Relatorio> atualizar(@PathVariable Integer id, @RequestBody Relatorio relatorioAtualizado) {
-        try {
-            Relatorio relatorioSalvo = service.atualizar(id, relatorioAtualizado);
-            return ResponseEntity.ok(relatorioSalvo);
-        } catch (EntidadeNaoEncontradaException e) {
-            return ResponseEntity.status(404).build();
-        } catch (EntidadeJaExistente e) {
-            return ResponseEntity.status(409).build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(400).build();
-        }
+    public ResponseEntity<Relatorio> atualizar(@PathVariable Integer id, @RequestBody Relatorio relatorioInput) {
+        Relatorio atualizado = service.atualizar(id, relatorioInput);
+        return ResponseEntity.ok(atualizado);
     }
 
     @GetMapping("/mesAno/{mesAno}")
