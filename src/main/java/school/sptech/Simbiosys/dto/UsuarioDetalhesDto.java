@@ -9,6 +9,7 @@ import java.util.List;
 
 public class UsuarioDetalhesDto implements UserDetails {
 
+    private Integer id;
     private String nome;
     private String sobrenome;
     private String cargo;
@@ -16,11 +17,20 @@ public class UsuarioDetalhesDto implements UserDetails {
     private String senha;
 
     public UsuarioDetalhesDto(Usuario usuario) {
+        this.id = usuario.getId();
         this.nome = usuario.getNome();
         this.sobrenome = usuario.getSobrenome();
         this.cargo = usuario.getCargo();
         this.email = usuario.getEmail();
         this.senha = usuario.getSenha();
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getNome() {

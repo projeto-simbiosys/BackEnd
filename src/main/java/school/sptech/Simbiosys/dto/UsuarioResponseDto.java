@@ -6,10 +6,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import school.sptech.Simbiosys.model.Usuario;
 
-@Entity
+
 public class UsuarioResponseDto {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Integer id;
     private String nome;
     private String sobrenome;
