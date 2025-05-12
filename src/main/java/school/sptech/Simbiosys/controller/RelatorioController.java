@@ -6,12 +6,16 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import school.sptech.Simbiosys.dto.*;
 import school.sptech.Simbiosys.exception.DadosInvalidosException;
 import school.sptech.Simbiosys.exception.EntidadeJaExistente;
 import school.sptech.Simbiosys.exception.EntidadeNaoEncontradaException;
 import school.sptech.Simbiosys.model.Relatorio;
+import school.sptech.Simbiosys.model.Usuario;
 import school.sptech.Simbiosys.repository.RelatorioRepository;
+import school.sptech.Simbiosys.repository.UsuarioRepository;
 import school.sptech.Simbiosys.service.RelatorioService;
 
 import java.io.File;
@@ -27,13 +31,22 @@ public class RelatorioController {
 
     @Autowired
     private RelatorioService service;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
     private static final String CAMINHO_PASTA = "/tmp/relatorios/";
 
     @PostMapping
-    public ResponseEntity<Relatorio> cadastrar (@RequestBody Relatorio relatorio) {
+    public ResponseEntity<RelatorioResponseDto> cadastrar (@RequestBody Relatorio relatorio, Authentication authentication) {
         try {
+            UsuarioDetalhesDto usuarioDetalhes = (UsuarioDetalhesDto) authentication.getPrincipal();
+            Usuario usuario = usuarioRepository.findByEmail(usuarioDetalhes.getEmail())
+                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+            relatorio.setUsuario(usuario);
             Relatorio relatorioSalvo = service.cadastrar(relatorio);
-            return ResponseEntity.status(201).body(relatorioSalvo);
+            RelatorioResponseDto relatorioResponseDto = new RelatorioResponseDto(relatorioSalvo);
+            relatorioResponseDto.setUsuario(UsuarioMapper.of(usuario));
+            return ResponseEntity.status(201).body(relatorioResponseDto);
         } catch (DadosInvalidosException e) {
             return ResponseEntity.status(400).build();
         }catch (EntidadeJaExistente e) {
@@ -72,9 +85,18 @@ public class RelatorioController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Relatorio> atualizar(@PathVariable Integer id, @RequestBody Relatorio relatorioInput) {
+    public ResponseEntity<RelatorioResponseDto> atualizar(@PathVariable Integer id, @RequestBody Relatorio relatorioInput, Authentication authentication) {
+        UsuarioDetalhesDto usuarioDetalhes = (UsuarioDetalhesDto) authentication.getPrincipal();
+
+        Usuario usuario = usuarioRepository.findByEmail(usuarioDetalhes.getEmail())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        relatorioInput.setUsuario(usuario);
+
         Relatorio atualizado = service.atualizar(id, relatorioInput);
-        return ResponseEntity.ok(atualizado);
+
+        RelatorioResponseDto relatorioResponseDto = new RelatorioResponseDto(relatorioInput);
+        relatorioResponseDto.setUsuario(UsuarioMapper.of(usuario));
+        return ResponseEntity.ok(relatorioResponseDto);
     }
 
     @GetMapping("/mesAno/{mesAno}")

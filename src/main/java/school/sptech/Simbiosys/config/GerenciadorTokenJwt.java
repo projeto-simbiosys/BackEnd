@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import school.sptech.Simbiosys.dto.UsuarioDetalhesDto;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -32,13 +33,32 @@ public class GerenciadorTokenJwt {
 
     public String generateToken(final Authentication authentication) {
 
-        // Para verificacoes de permissões;
-        final String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+        // Autoridades
+        final String authorities = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
-        return Jwts.builder().setSubject(authentication.getName())
-                .signWith(parseSecret()).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtTokenValidity * 1_000)).compact();
+        // Pegando o objeto do usuário logado (precisa ser um UserDetails customizado!)
+        Object principal = authentication.getPrincipal();
+
+        // Verifique se é seu tipo personalizado
+        if (!(principal instanceof UsuarioDetalhesDto)) {
+            throw new IllegalArgumentException("Principal não é do tipo esperado.");
+        }
+
+        UsuarioDetalhesDto usuario = (UsuarioDetalhesDto) principal;
+
+        return Jwts.builder()
+                .setSubject(usuario.getUsername())
+                .claim("id", usuario.getId()    )
+                .claim("nome", usuario.getNome())
+                .claim("sobrenome", usuario.getSobrenome())
+                .claim("email", usuario.getEmail())
+                .claim("authorities", authorities)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + jwtTokenValidity * 1_000))
+                .signWith(parseSecret())
+                .compact();
     }
 
     public <T> T getClaimForToken(String token, Function<Claims, T> claimsResolver) {
