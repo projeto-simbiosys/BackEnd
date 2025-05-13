@@ -2,16 +2,16 @@ package school.sptech.Simbiosys.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import school.sptech.Simbiosys.dto.UsuarioDetalhesDto;
 import school.sptech.Simbiosys.event.RelatorioCriadoEvent;
 import school.sptech.Simbiosys.exception.EntidadeJaExistente;
 import school.sptech.Simbiosys.exception.EntidadeNaoEncontradaException;
 import school.sptech.Simbiosys.exception.RelatorioNaoEncontradoException;
-import school.sptech.Simbiosys.model.AcoesRealizadas;
-import school.sptech.Simbiosys.model.Encaminhamento;
-import school.sptech.Simbiosys.model.OutrosNumeros;
-import school.sptech.Simbiosys.model.Relatorio;
+import school.sptech.Simbiosys.model.*;
 import school.sptech.Simbiosys.repository.RelatorioRepository;
+import school.sptech.Simbiosys.repository.UsuarioRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,6 +23,8 @@ public class RelatorioService {
 
     @Autowired
     private RelatorioRepository repository;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
     private final ApplicationEventPublisher publisher;
 
     public RelatorioService(RelatorioRepository repository, ApplicationEventPublisher publisher) {
@@ -30,12 +32,14 @@ public class RelatorioService {
         this.publisher = publisher;
     }
 
-    public Relatorio cadastrar(Relatorio relatorio){
+    public Relatorio cadastrar(Relatorio relatorio, Authentication authentication){
         if(repository.existsByMesAno(relatorio.getMesAno())){
             throw new EntidadeJaExistente("Relatório com nome %s já cadastrado".formatted(relatorio.getMesAno()));
         }
-        Relatorio salvo = repository.save(relatorio);
 
+
+        relatorio.setUsuario(pegarUsuarioAutenticado(authentication));
+        Relatorio salvo = repository.save(relatorio);
         publisher.publishEvent(new RelatorioCriadoEvent(this, salvo));
 
         return salvo;
@@ -55,7 +59,7 @@ public class RelatorioService {
         repository.deleteById(id);
     }
 
-    public Relatorio atualizar(Integer id, Relatorio input) {
+    public Relatorio atualizar(Integer id, Relatorio input, Authentication authentication) {
         Relatorio relatorio = repository.findById(id)
                 .orElseThrow(() -> new EntidadeNaoEncontradaException("Relatório não encontrado com id: " + id));
 
@@ -129,7 +133,10 @@ public class RelatorioService {
             relatorio.setAcoesRealizadas(acoes);
         }
 
+        input.setUsuario(pegarUsuarioAutenticado(authentication));
+        relatorio.setUsuario(pegarUsuarioAutenticado(authentication));
         relatorio.setDataAtualizacao(LocalDateTime.now());
+
         return repository.save(relatorio);
     }
 
@@ -211,6 +218,14 @@ public class RelatorioService {
 
     public List<Relatorio> buscarRelatoriosPorPeriodo(String de, String para) {
         return repository.findByPeriodo(de, para);
+    }
+
+    private Usuario pegarUsuarioAutenticado(Authentication authentication){
+        UsuarioDetalhesDto usuarioDetalhes = (UsuarioDetalhesDto) authentication.getPrincipal();
+
+        Usuario usuario = usuarioRepository.findByEmail(usuarioDetalhes.getEmail())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        return usuario;
     }
 }
 

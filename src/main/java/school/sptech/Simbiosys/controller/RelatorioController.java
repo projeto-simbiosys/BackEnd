@@ -31,21 +31,14 @@ public class RelatorioController {
 
     @Autowired
     private RelatorioService service;
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+
     private static final String CAMINHO_PASTA = "/tmp/relatorios/";
 
     @PostMapping
     public ResponseEntity<RelatorioResponseDto> cadastrar (@RequestBody Relatorio relatorio, Authentication authentication) {
         try {
-            UsuarioDetalhesDto usuarioDetalhes = (UsuarioDetalhesDto) authentication.getPrincipal();
-            Usuario usuario = usuarioRepository.findByEmail(usuarioDetalhes.getEmail())
-                    .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
-            relatorio.setUsuario(usuario);
-            Relatorio relatorioSalvo = service.cadastrar(relatorio);
+            Relatorio relatorioSalvo = service.cadastrar(relatorio, authentication);
             RelatorioResponseDto relatorioResponseDto = new RelatorioResponseDto(relatorioSalvo);
-            relatorioResponseDto.setUsuario(UsuarioMapper.of(usuario));
             return ResponseEntity.status(201).body(relatorioResponseDto);
         } catch (DadosInvalidosException e) {
             return ResponseEntity.status(400).build();
@@ -86,16 +79,8 @@ public class RelatorioController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<RelatorioResponseDto> atualizar(@PathVariable Integer id, @RequestBody Relatorio relatorioInput, Authentication authentication) {
-        UsuarioDetalhesDto usuarioDetalhes = (UsuarioDetalhesDto) authentication.getPrincipal();
-
-        Usuario usuario = usuarioRepository.findByEmail(usuarioDetalhes.getEmail())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-        relatorioInput.setUsuario(usuario);
-
-        Relatorio atualizado = service.atualizar(id, relatorioInput);
-
+        service.atualizar(id, relatorioInput, authentication);
         RelatorioResponseDto relatorioResponseDto = new RelatorioResponseDto(relatorioInput);
-        relatorioResponseDto.setUsuario(UsuarioMapper.of(usuario));
         return ResponseEntity.ok(relatorioResponseDto);
     }
 
