@@ -8,13 +8,15 @@ public class UsuarioRequestDto {
     private String cargo;
     private String email;
     private String senha;
+    private String token;
 
-    public UsuarioRequestDto(String nome, String sobrenome, String cargo, String email, String senha) {
+    public UsuarioRequestDto(String nome, String sobrenome, String cargo, String email, String senha, String token) {
         this.nome = nome;
         this.sobrenome = sobrenome;
         this.cargo = cargo;
         this.email = email;
         this.senha = senha;
+        this.token = token;
     }
 
     public String getSobrenome() {
@@ -57,12 +59,23 @@ public class UsuarioRequestDto {
         this.senha = senha;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     @Override
     public String toString() {
         return "UsuarioRequestDto{" +
                 "nome='" + nome + '\'' +
+                ", sobrenome='" + sobrenome + '\'' +
+                ", cargo='" + cargo + '\'' +
                 ", email='" + email + '\'' +
                 ", senha='" + senha + '\'' +
+                ", token='" + token + '\'' +
                 '}';
     }
 }

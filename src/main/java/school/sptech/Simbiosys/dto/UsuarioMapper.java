@@ -14,6 +14,7 @@ public class UsuarioMapper {
         usuario.setCargo(usuarioCriacaoDto.getCargo());
         usuario.setEmail(usuarioCriacaoDto.getEmail());
         usuario.setSenha(encryptedPassword);
+        usuario.setToken(usuarioCriacaoDto.getToken());
 
         return usuario;
     }

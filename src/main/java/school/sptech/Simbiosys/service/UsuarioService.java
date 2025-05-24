@@ -13,6 +13,7 @@ import school.sptech.Simbiosys.dto.UsuarioMapper;
 import school.sptech.Simbiosys.dto.UsuarioRequestDto;
 import school.sptech.Simbiosys.dto.UsuarioResponseDto;
 import school.sptech.Simbiosys.dto.UsuarioTokenDto;
+import school.sptech.Simbiosys.exception.DadosInvalidosException;
 import school.sptech.Simbiosys.exception.UsuarioException;
 import school.sptech.Simbiosys.model.Usuario;
 import school.sptech.Simbiosys.repository.UsuarioRepository;
@@ -48,19 +49,23 @@ public class UsuarioService {
     public Usuario cadastrarUsuario(UsuarioRequestDto dto) {
 
         if (dto.getNome() == null || dto.getNome().trim().isEmpty()) {
-            throw new UsuarioException("O nome é obrigatório.");
+            throw new DadosInvalidosException("O nome é obrigatório.");
         }
 
         if (dto.getEmail() == null || !dto.getEmail().contains("@") || !dto.getEmail().contains(".")) {
-            throw new UsuarioException("Email inválido.");
+            throw new DadosInvalidosException("Email inválido.");
         }
 
         if (dto.getSenha() == null || dto.getSenha().length() < 6) {
-            throw new UsuarioException("A senha deve ter pelo menos 6 caracteres.");
+            throw new DadosInvalidosException("A senha deve ter pelo menos 6 caracteres.");
         }
 
         if (usuarioRepository.existsByEmailIgnoreCaseContaining(dto.getEmail())) {
             throw new UsuarioException("Já existe um usuário cadastrado com este email.");
+        }
+
+        if (!dto.getToken().equals("#ACESSO-CEFOPEA")) {
+            throw new DadosInvalidosException("Token para cadastro inválido.");
         }
 
 
