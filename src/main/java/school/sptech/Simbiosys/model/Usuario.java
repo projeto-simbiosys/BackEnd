@@ -17,17 +17,19 @@ public class Usuario implements UserDetails {
     private String cargo;
     private String email;
     private String senha;
+    private String token;
 
     public Usuario() {
     }
 
-    public Usuario(Integer id, String nome, String sobrenome, String cargo, String email, String senha) {
+    public Usuario(Integer id, String nome, String sobrenome, String cargo, String email, String senha, String token) {
         this.id = id;
         this.nome = nome;
         this.sobrenome = sobrenome;
         this.cargo = cargo;
         this.email = email;
         this.senha = senha;
+        this.token = token;
     }
 
     public String getSobrenome() {
@@ -78,6 +80,13 @@ public class Usuario implements UserDetails {
         this.senha = senha;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
