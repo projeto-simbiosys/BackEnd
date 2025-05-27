@@ -7,6 +7,17 @@ public class UsuarioTokenDto {
     private String email;
     private String token;
 
+    public UsuarioTokenDto(Integer userId, String nome, String email, String token) {
+        this.userId = userId;
+        this.nome = nome;
+        this.email = email;
+        this.token = token;
+    }
+
+    public UsuarioTokenDto() {
+
+    }
+
     public Integer getUserId() {
         return userId;
     }
