@@ -13,30 +13,28 @@ import school.sptech.Simbiosys.model.*;
 import school.sptech.Simbiosys.repository.RelatorioRepository;
 import school.sptech.Simbiosys.repository.UsuarioRepository;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class RelatorioService {
 
     @Autowired
-    private RelatorioRepository repository;
+    private final RelatorioRepository repository;
     @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
     private final ApplicationEventPublisher publisher;
 
-    public RelatorioService(RelatorioRepository repository, ApplicationEventPublisher publisher) {
+    public RelatorioService(RelatorioRepository repository, ApplicationEventPublisher publisher, UsuarioRepository usuarioRepository) {
         this.repository = repository;
         this.publisher = publisher;
+        this.usuarioRepository = usuarioRepository;
     }
 
     public Relatorio cadastrar(Relatorio relatorio, Authentication authentication){
         if(repository.existsByMesAno(relatorio.getMesAno())){
             throw new EntidadeJaExistente("Relatório com nome %s já cadastrado".formatted(relatorio.getMesAno()));
         }
-
 
         relatorio.setUsuario(pegarUsuarioAutenticado(authentication));
         Relatorio salvo = repository.save(relatorio);
