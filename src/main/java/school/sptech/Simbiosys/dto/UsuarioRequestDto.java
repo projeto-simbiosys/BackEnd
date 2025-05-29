@@ -19,6 +19,10 @@ public class UsuarioRequestDto {
         this.token = token;
     }
 
+    public UsuarioRequestDto() {
+
+    }
+
     public String getSobrenome() {
         return sobrenome;
     }
