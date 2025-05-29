@@ -1,6 +1,7 @@
 package school.sptech.Simbiosys.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -61,7 +62,7 @@ public class UsuarioService {
         }
 
         if (usuarioRepository.existsByEmailIgnoreCaseContaining(dto.getEmail())) {
-            throw new UsuarioException("Já existe um usuário cadastrado com este email.");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Já existe um usuário cadastrado com este email.");
         }
 
         if (!dto.getToken().equals("#ACESSO-CEFOPEA")) {
