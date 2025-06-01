@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import school.sptech.Simbiosys.dto.*;
 import school.sptech.Simbiosys.model.Usuario;
-import school.sptech.Simbiosys.service.AlterarSenhaDto;
+import school.sptech.Simbiosys.dto.AlterarSenhaDto;
 import school.sptech.Simbiosys.service.UsuarioService;
 
 import java.util.List;

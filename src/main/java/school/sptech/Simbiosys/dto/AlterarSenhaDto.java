@@ -1,4 +1,4 @@
-package school.sptech.Simbiosys.service;
+package school.sptech.Simbiosys.dto;
 
 public class AlterarSenhaDto {
     private String novaSenha;

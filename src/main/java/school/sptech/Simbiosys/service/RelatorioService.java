@@ -138,13 +138,6 @@ public class RelatorioService {
         return repository.save(relatorio);
     }
 
-    private void atualizarCamposNaoNulos(Relatorio existente, Relatorio atualizado) {
-        if (atualizado.getMesAno() != null) existente.setMesAno(atualizado.getMesAno());
-        if (atualizado.getEncaminhamento() != null) existente.setEncaminhamento(atualizado.getEncaminhamento());
-        if (atualizado.getOutrosNumeros() != null) existente.setOutrosNumeros(atualizado.getOutrosNumeros());
-        if (atualizado.getAcoesRealizadas() != null) existente.setAcoesRealizadas(atualizado.getAcoesRealizadas());
-    }
-
     public Relatorio buscarPorMesAno(String mesAno) {
         if (!repository.existsByMesAno(mesAno)) {
             throw new EntidadeNaoEncontradaException("Relatório com mes/ano: %s não encontrado".formatted(mesAno));

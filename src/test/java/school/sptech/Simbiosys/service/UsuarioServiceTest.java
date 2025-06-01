@@ -256,4 +256,104 @@ public class UsuarioServiceTest {
 
         assertFalse(resultado);
     }
+
+    @Test
+    void deveRetornarListaVaziaQuandoNomeForNuloOuVazio() {
+        List<UsuarioResponseDto> resultado1 = usuarioService.buscarPorNome(null);
+        List<UsuarioResponseDto> resultado2 = usuarioService.buscarPorNome(" ");
+
+        assertTrue(resultado1.isEmpty());
+        assertTrue(resultado2.isEmpty());
+
+        verify(usuarioRepository, never())
+                .findByNomeContainingIgnoreCase(anyString());
+    }
+
+    @Test
+    void deveBuscarPorEmailComSucesso() {
+        String email = "joao@email.com";
+        Usuario usuario = new Usuario();
+        usuario.setId(1);
+        usuario.setNome("João");
+        usuario.setEmail(email);
+
+        when(usuarioRepository.findByEmail(email))
+                .thenReturn(Optional.of(usuario));
+
+        Optional<UsuarioResponseDto> resultado = usuarioService.buscarPorEmail(email);
+
+        assertTrue(resultado.isPresent());
+        assertEquals("João", resultado.get().getNome());
+
+        verify(usuarioRepository, times(1))
+                .findByEmail(email);
+    }
+
+    @Test
+    void deveRetornarNullQuandoEmailInvalido() {
+        Optional<UsuarioResponseDto> resultado1 = usuarioService.buscarPorEmail(null);
+        Optional<UsuarioResponseDto> resultado2 = usuarioService.buscarPorEmail("   ");
+        Optional<UsuarioResponseDto> resultado3 = usuarioService.buscarPorEmail("semarroba.com");
+
+        assertNull(resultado1);
+        assertNull(resultado2);
+        assertNull(resultado3);
+
+        verify(usuarioRepository, never())
+                .findByEmail(anyString());
+    }
+
+    @Test
+    void deveAlterarSenhaComSucesso() {
+        Integer id = 1;
+        String novaSenha = "senhaNova";
+
+        Usuario usuario = new Usuario();
+        usuario.setId(id);
+        usuario.setSenha("senhaAntiga");
+
+        when(usuarioRepository.findById(id))
+                .thenReturn(Optional.of(usuario));
+
+        boolean resultado = usuarioService.alterarSenha(id, novaSenha);
+
+        assertTrue(resultado);
+        assertEquals(novaSenha, usuario.getSenha());
+
+        verify(usuarioRepository, times(1))
+                .findById(id);
+        verify(usuarioRepository, times(1))
+                .save(usuario);
+    }
+
+    @Test
+    void naoDeveAlterarSenhaQuandoIdOuSenhaForemInvalidos() {
+        boolean resultado1 = usuarioService.alterarSenha(null, "senhaValida");
+        boolean resultado2 = usuarioService.alterarSenha(0, "senhaValida");
+        boolean resultado3 = usuarioService.alterarSenha(1, null);
+        boolean resultado4 = usuarioService.alterarSenha(1, "123");
+
+        assertFalse(resultado1);
+        assertFalse(resultado2);
+        assertFalse(resultado3);
+        assertFalse(resultado4);
+
+        verify(usuarioRepository, never()).findById(any());
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void naoDeveAlterarSenhaSeUsuarioNaoExiste() {
+        Integer id = 99;
+        String novaSenha = "senhaValida";
+
+        when(usuarioRepository.findById(id)).thenReturn(Optional.empty());
+
+        boolean resultado = usuarioService.alterarSenha(id, novaSenha);
+
+        assertFalse(resultado);
+
+        verify(usuarioRepository, times(1)).findById(id);
+        verify(usuarioRepository, never()).save(any());
+    }
 }
