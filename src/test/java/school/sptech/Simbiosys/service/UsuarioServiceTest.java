@@ -10,15 +10,15 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import school.sptech.Simbiosys.config.GerenciadorTokenJwt;
-import school.sptech.Simbiosys.dto.UsuarioMapper;
-import school.sptech.Simbiosys.dto.UsuarioRequestDto;
-import school.sptech.Simbiosys.dto.UsuarioResponseDto;
-import school.sptech.Simbiosys.dto.UsuarioTokenDto;
-import school.sptech.Simbiosys.exception.DadosInvalidosException;
-import school.sptech.Simbiosys.model.Usuario;
-import school.sptech.Simbiosys.repository.UsuarioRepository;
+import school.sptech.Simbiosys.core.service.UsuarioService;
+import school.sptech.Simbiosys.infrastructure.config.GerenciadorTokenJwt;
+import school.sptech.Simbiosys.core.dto.UsuarioMapper;
+import school.sptech.Simbiosys.core.dto.UsuarioRequestDto;
+import school.sptech.Simbiosys.core.dto.UsuarioResponseDto;
+import school.sptech.Simbiosys.core.dto.UsuarioTokenDto;
+import school.sptech.Simbiosys.core.application.exception.DadosInvalidosException;
+import school.sptech.Simbiosys.infrastructure.persistence.entity.UsuarioEntity;
+import school.sptech.Simbiosys.infrastructure.persistence.repository.UsuarioRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -125,16 +125,16 @@ public class UsuarioServiceTest {
         dto.setSenha("123456");
         dto.setToken("#ACESSO-CEFOPEA");
 
-        Usuario usuario = new Usuario();
+        UsuarioEntity usuario = new UsuarioEntity();
         usuario.setId(1);
         usuario.setNome("Matheus Ferro");
         usuario.setEmail("matheus@email.com");
         usuario.setSenha("123456");
 
         when(usuarioRepository.existsByEmailIgnoreCaseContaining(dto.getEmail())).thenReturn(false);
-        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
+        when(usuarioRepository.save(any(UsuarioEntity.class))).thenReturn(usuario);
 
-        Usuario resultado = usuarioService.cadastrarUsuario(dto);
+        UsuarioEntity resultado = usuarioService.cadastrarUsuario(dto);
 
         assertNotNull(resultado);
         assertEquals("matheus@email.com", resultado.getEmail());
@@ -143,7 +143,7 @@ public class UsuarioServiceTest {
     @Test
     @DisplayName("Deve autenticar usuário com sucesso")
     void deveAutenticarUsuarioComSucesso() {
-        Usuario usuario = new Usuario();
+        UsuarioEntity usuario = new UsuarioEntity();
         usuario.setEmail("reynald@email.com");
         usuario.setSenha("123456");
 
@@ -170,7 +170,7 @@ public class UsuarioServiceTest {
     @Test
     @DisplayName("Deve lançar exceção ao falhar autenticação do usuário")
     void deveLancarExcecaoQuandoAutenticacaoFalhar() {
-        Usuario usuario = new Usuario();
+        UsuarioEntity usuario = new UsuarioEntity();
         usuario.setEmail("cintia@email.com");
         usuario.setSenha("123456");
 
@@ -187,7 +187,7 @@ public class UsuarioServiceTest {
     @Test
     @DisplayName("Deve retornar usuário existente por ID")
     void deveRetornarUsuarioPorId() {
-        Usuario usuario = new Usuario();
+        UsuarioEntity usuario = new UsuarioEntity();
         usuario.setId(1);
         usuario.setNome("Vitoria");
         usuario.setEmail("vitoria@email.com");
@@ -205,7 +205,7 @@ public class UsuarioServiceTest {
     void deveAtualizarUsuarioComSucesso() {
         Integer id = 1;
 
-        Usuario usuarioExistente = new Usuario();
+        UsuarioEntity usuarioExistente = new UsuarioEntity();
         usuarioExistente.setId(id);
         usuarioExistente.setNome("Antigo");
         usuarioExistente.setEmail("antigo@email.com");
@@ -218,7 +218,7 @@ public class UsuarioServiceTest {
         dto.setEmail("novo@email.com");
         dto.setSenha("654321");
 
-        Usuario usuarioAtualizado = new Usuario();
+        UsuarioEntity usuarioAtualizado = new UsuarioEntity();
         usuarioAtualizado.setId(id);
         usuarioAtualizado.setNome(dto.getNome());
         usuarioAtualizado.setSobrenome(dto.getSobrenome());
@@ -227,7 +227,7 @@ public class UsuarioServiceTest {
         usuarioAtualizado.setSenha(dto.getSenha());
 
         when(usuarioRepository.findById(id)).thenReturn(Optional.of(usuarioExistente));
-        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuarioAtualizado);
+        when(usuarioRepository.save(any(UsuarioEntity.class))).thenReturn(usuarioAtualizado);
 
         Optional<UsuarioResponseDto> resultado = usuarioService.atualizarUsuario(id, dto);
 
@@ -272,7 +272,7 @@ public class UsuarioServiceTest {
     @Test
     void deveBuscarPorEmailComSucesso() {
         String email = "joao@email.com";
-        Usuario usuario = new Usuario();
+        UsuarioEntity usuario = new UsuarioEntity();
         usuario.setId(1);
         usuario.setNome("João");
         usuario.setEmail(email);
@@ -308,7 +308,7 @@ public class UsuarioServiceTest {
         Integer id = 1;
         String novaSenha = "senhaNova";
 
-        Usuario usuario = new Usuario();
+        UsuarioEntity usuario = new UsuarioEntity();
         usuario.setId(id);
         usuario.setSenha("senhaAntiga");
 

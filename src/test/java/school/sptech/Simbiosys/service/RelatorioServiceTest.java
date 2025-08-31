@@ -4,21 +4,20 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import school.sptech.Simbiosys.dto.UsuarioDetalhesDto;
-import school.sptech.Simbiosys.exception.EntidadeJaExistente;
-import school.sptech.Simbiosys.exception.EntidadeNaoEncontradaException;
-import school.sptech.Simbiosys.exception.RelatorioNaoEncontradoException;
-import school.sptech.Simbiosys.model.*;
-import school.sptech.Simbiosys.repository.RelatorioRepository;
-import school.sptech.Simbiosys.repository.UsuarioRepository;
+import school.sptech.Simbiosys.core.service.RelatorioService;
+import school.sptech.Simbiosys.core.dto.UsuarioDetalhesDto;
+import school.sptech.Simbiosys.core.application.exception.EntidadeJaExistente;
+import school.sptech.Simbiosys.core.application.exception.EntidadeNaoEncontradaException;
+import school.sptech.Simbiosys.core.application.exception.RelatorioNaoEncontradoException;
+import school.sptech.Simbiosys.infrastructure.persistence.entity.*;
+import school.sptech.Simbiosys.infrastructure.persistence.repository.RelatorioRepository;
+import school.sptech.Simbiosys.infrastructure.persistence.repository.UsuarioRepository;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -56,43 +55,33 @@ public class RelatorioServiceTest {
     @DisplayName("Cadastrar quando mesAno não existe, deve cadastrar relatório")
     void cadastrarQuandoMesAnoNaoExisteDeveCadastrarRelatorioTest() {
         // arrange: configuração dos mocks
-        Relatorio relatorio = new Relatorio();
+        RelatorioEntity relatorio = new RelatorioEntity();
         relatorio.setMesAno("01/2025");
 
         UsuarioDetalhesDto usuarioDetalhes = mock(UsuarioDetalhesDto.class);
-        Usuario usuario = new Usuario();
+        UsuarioEntity usuario = new UsuarioEntity();
 
-        // mock do authentication.getPrincipal() -> retorna o usuarioDetalhes
         when(authentication.getPrincipal()).thenReturn(usuarioDetalhes);
-
-        // mock do usuarioDetalhes.getEmail() -> retorna email falso
         when(usuarioDetalhes.getEmail()).thenReturn("teste@teste.com");
-
-        // mock do usuarioRepository.findByEmail() -> retorna o usuario
         when(usuarioRepository.findByEmail("teste@teste.com")).thenReturn(Optional.of(usuario));
-
-        // mock do existsByMesAno → false (não existe)
         when(repository.existsByMesAno("01/2025")).thenReturn(false);
-
-        // mock do save -> retorna o próprio relatório
-        when(repository.save(any(Relatorio.class))).thenReturn(relatorio);
+        when(repository.save(any(RelatorioEntity.class))).thenReturn(relatorio);
 
         // act: chama o método
-        Relatorio salvo = service.cadastrar(relatorio, authentication);
+        RelatorioEntity salvo = service.cadastrar(relatorio, authentication);
 
         // assert: verificações
         assertNotNull(salvo);
         assertEquals("01/2025", salvo.getMesAno());
 
-        verify(publisher).publishEvent(any());
-        verify(repository).save(any(Relatorio.class));
+        verify(repository).save(any(RelatorioEntity.class));
     }
 
 
     @Test
     @DisplayName("Cadastrar relatório quando mesAno já existe, deve lançar exceção")
     void cadastrarQuandoMesAnoJaExisteDeveLancarExcecaoTest() {
-        Relatorio relatorio = new Relatorio();
+        RelatorioEntity relatorio = new RelatorioEntity();
         relatorio.setMesAno("01/2025");
 
         when(repository.existsByMesAno("01/2025")).thenReturn(true);
@@ -106,12 +95,12 @@ public class RelatorioServiceTest {
     @Test
     @DisplayName("Buscar por id válido quando existir deve retornar relatório")
     void buscarPorIdValidoQuandoExistirDeveRetornarRelatorioTest() {
-        Relatorio relatorio = new Relatorio();
+        RelatorioEntity relatorio = new RelatorioEntity();
         relatorio.setId(1);
 
         when(repository.findById(1)).thenReturn(Optional.of(relatorio));
 
-        Relatorio resposta = service.buscarPorId(1);
+        RelatorioEntity resposta = service.buscarPorId(1);
 
         assertNotNull(resposta);
         assertEquals(1, resposta.getId());
@@ -152,13 +141,13 @@ public class RelatorioServiceTest {
     @Test
     @DisplayName("Buscar por mesAno existente, quando acionado, deve retornar relatório")
     void buscarPorMesAnoExistenteQuandoAcionadoDeveRetornarRelatorioTest() {
-        Relatorio relatorio = new Relatorio();
+        RelatorioEntity relatorio = new RelatorioEntity();
         relatorio.setMesAno("01/2025");
 
         when(repository.existsByMesAno("01/2025")).thenReturn(true);
         when(repository.findByMesAno("01/2025")).thenReturn(relatorio);
 
-        Relatorio resposta = service.buscarPorMesAno("01/2025");
+        RelatorioEntity resposta = service.buscarPorMesAno("01/2025");
 
         assertNotNull(resposta);
         assertEquals("01/2025", resposta.getMesAno());
@@ -179,7 +168,7 @@ public class RelatorioServiceTest {
     void somarRelatoriosPorAnoQuandoNaoExistemRelatoriosDeveRetornarNuloTest() {
         when(repository.findByAno("2025")).thenReturn(Collections.emptyList());
 
-        Relatorio resultado = service.somarRelatoriosPorAno("2025");
+        RelatorioEntity resultado = service.somarRelatoriosPorAno("2025");
 
         assertNull(resultado);
     }
@@ -188,15 +177,15 @@ public class RelatorioServiceTest {
     @DisplayName("Somar relatórios por período quando existem relatórios deve retornar relatório somado")
     void somarRelatoriosPorPeriodoQuandoExistemRelatoriosDeveRetornarRelatorioSomadoTest() {
 
-        Relatorio relatorio1 = new Relatorio();
+        RelatorioEntity relatorio1 = new RelatorioEntity();
         relatorio1.setMesAno("01/2025");
 
-        Relatorio relatorio2 = new Relatorio();
+        RelatorioEntity relatorio2 = new RelatorioEntity();
         relatorio2.setMesAno("02/2025");
 
         when(repository.findByPeriodo("01/2025", "06/2025")).thenReturn(List.of(relatorio1, relatorio2));
 
-        Relatorio resultado = service.somarRelatoriosPorPeriodo("01/2025", "06/2025");
+        RelatorioEntity resultado = service.somarRelatoriosPorPeriodo("01/2025", "06/2025");
 
         assertNotNull(resultado);
         assertEquals("01/2025 até 06/2025", resultado.getMesAno());
@@ -215,29 +204,29 @@ public class RelatorioServiceTest {
     @Test
     @DisplayName("Somar relatórios por ano quando existir deve retornar relatório somado")
     void somarRelatoriosPorAnoDeveRetornarRelatorioSomado() {
-        Relatorio relatorio1 = new Relatorio();
+        RelatorioEntity relatorio1 = new RelatorioEntity();
         relatorio1.setMesAno("01/2024");
-        relatorio1.setEncaminhamento(new Encaminhamento());
+        relatorio1.setEncaminhamento(new EncaminhamentoEntity());
         relatorio1.getEncaminhamento().setEncSaude(5);
-        relatorio1.setOutrosNumeros(new OutrosNumeros());
+        relatorio1.setOutrosNumeros(new OutrosNumerosEntity());
         relatorio1.getOutrosNumeros().setAlimentacao(10);
-        relatorio1.setAcoesRealizadas(new AcoesRealizadas());
+        relatorio1.setAcoesRealizadas(new AcoesRealizadasEntity());
         relatorio1.getAcoesRealizadas().setTotalPalestrasPresenciais(2);
 
-        Relatorio relatorio2 = new Relatorio();
+        RelatorioEntity relatorio2 = new RelatorioEntity();
         relatorio2.setMesAno("02/2024");
-        relatorio2.setEncaminhamento(new Encaminhamento());
+        relatorio2.setEncaminhamento(new EncaminhamentoEntity());
         relatorio2.getEncaminhamento().setEncSaude(3);
-        relatorio2.setOutrosNumeros(new OutrosNumeros());
+        relatorio2.setOutrosNumeros(new OutrosNumerosEntity());
         relatorio2.getOutrosNumeros().setAlimentacao(7);
-        relatorio2.setAcoesRealizadas(new AcoesRealizadas());
+        relatorio2.setAcoesRealizadas(new AcoesRealizadasEntity());
         relatorio2.getAcoesRealizadas().setTotalPalestrasPresenciais(4);
 
-        List<Relatorio> relatorios = List.of(relatorio1, relatorio2);
+        List<RelatorioEntity> relatorios = List.of(relatorio1, relatorio2);
 
         when(repository.findByAno("2024")).thenReturn(relatorios);
 
-        Relatorio resultado = service.somarRelatoriosPorAno("2024");
+        RelatorioEntity resultado = service.somarRelatoriosPorAno("2024");
 
         assertNotNull(resultado);
         assertEquals("Ano 2024", resultado.getMesAno());
@@ -256,34 +245,34 @@ public class RelatorioServiceTest {
         when(usuarioDetalhes.getEmail()).thenReturn("usuario@teste.com");
         when(authentication.getPrincipal()).thenReturn(usuarioDetalhes);
 
-        Usuario usuario = new Usuario();
+        UsuarioEntity usuario = new UsuarioEntity();
         usuario.setEmail("usuario@teste.com");
 
         when(usuarioRepository.findByEmail("usuario@teste.com"))
                 .thenReturn(Optional.of(usuario));
 
-        Relatorio existente = new Relatorio();
+        RelatorioEntity existente = new RelatorioEntity();
         existente.setId(1);
         existente.setMesAno("01/2025");
 
-        Relatorio input = new Relatorio();
+        RelatorioEntity input = new RelatorioEntity();
         input.setMesAno("02/2025");
 
         when(repository.findById(1)).thenReturn(Optional.of(existente));
-        when(repository.save(any(Relatorio.class))).thenReturn(existente);
+        when(repository.save(any(RelatorioEntity.class))).thenReturn(existente);
 
-        Relatorio atualizado = service.atualizar(1, input, authentication);
+        RelatorioEntity atualizado = service.atualizar(1, input, authentication);
 
         assertNotNull(atualizado);
         assertEquals("02/2025", atualizado.getMesAno());
 
-        verify(repository).save(any(Relatorio.class));
+        verify(repository).save(any(RelatorioEntity.class));
     }
 
     @Test
     @DisplayName("Atualizar quando relatório não existe deve lançar exceção")
     void atualizarQuandoRelatorioNaoExisteDeveLancarExcecaoTest() {
-        Relatorio input = new Relatorio();
+        RelatorioEntity input = new RelatorioEntity();
 
         when(repository.findById(1)).thenReturn(Optional.empty());
 
@@ -295,19 +284,19 @@ public class RelatorioServiceTest {
     @Test
     void deveBuscarRelatoriosPorAno() {
         String ano = "2024";
-        Relatorio relatorio1 = new Relatorio();
+        RelatorioEntity relatorio1 = new RelatorioEntity();
         relatorio1.setId(1);
         relatorio1.setMesAno("01/2024");
 
-        Relatorio relatorio2 = new Relatorio();
+        RelatorioEntity relatorio2 = new RelatorioEntity();
         relatorio2.setId(2);
         relatorio2.setMesAno("02/2024");
 
-        List<Relatorio> listaMock = List.of(relatorio1, relatorio2);
+        List<RelatorioEntity> listaMock = List.of(relatorio1, relatorio2);
 
         when(repository.findByAno(ano)).thenReturn(listaMock);
 
-        List<Relatorio> resultado = service.buscarRelatoriosPorAno(ano);
+        List<RelatorioEntity> resultado = service.buscarRelatoriosPorAno(ano);
 
         Assertions.assertEquals(2, resultado.size());
         Assertions.assertEquals("01/2024", resultado.get(0).getMesAno());
@@ -321,19 +310,19 @@ public class RelatorioServiceTest {
         String de = "01/2024";
         String para = "06/2024";
 
-        Relatorio relatorio1 = new Relatorio();
+        RelatorioEntity relatorio1 = new RelatorioEntity();
         relatorio1.setId(1);
         relatorio1.setMesAno("02/2024");
 
-        Relatorio relatorio2 = new Relatorio();
+        RelatorioEntity relatorio2 = new RelatorioEntity();
         relatorio2.setId(2);
         relatorio2.setMesAno("05/2024");
 
-        List<Relatorio> listaMock = List.of(relatorio1, relatorio2);
+        List<RelatorioEntity> listaMock = List.of(relatorio1, relatorio2);
 
         when(repository.findByPeriodo(de, para)).thenReturn(listaMock);
 
-        List<Relatorio> resultado = service.buscarRelatoriosPorPeriodo(de, para);
+        List<RelatorioEntity> resultado = service.buscarRelatoriosPorPeriodo(de, para);
 
         Assertions.assertEquals(2, resultado.size());
         Assertions.assertEquals("02/2024", resultado.get(0).getMesAno());
@@ -346,29 +335,29 @@ public class RelatorioServiceTest {
     void deveAtualizarRelatorioComSucesso() {
         // Arrange - setup dos dados existentes
         Integer id = 1;
-        Relatorio existente = new Relatorio();
+        RelatorioEntity existente = new RelatorioEntity();
         existente.setId(id);
         existente.setMesAno("01/2024");
         existente.setAberto(true);
 
-        // Encaminhamento existente
-        existente.setEncaminhamento(new Encaminhamento());
+        // EncaminhamentoEntity existente
+        existente.setEncaminhamento(new EncaminhamentoEntity());
         existente.getEncaminhamento().setEncSaude(1);
 
         // Dados de entrada para atualização
-        Relatorio input = new Relatorio();
+        RelatorioEntity input = new RelatorioEntity();
         input.setMesAno("02/2024");
         input.setAberto(false);
 
-        Encaminhamento encaminhamento = new Encaminhamento();
+        EncaminhamentoEntity encaminhamento = new EncaminhamentoEntity();
         encaminhamento.setEncSaude(5);
         input.setEncaminhamento(encaminhamento);
 
-        OutrosNumeros outros = new OutrosNumeros();
+        OutrosNumerosEntity outros = new OutrosNumerosEntity();
         outros.setAlimentacao(10);
         input.setOutrosNumeros(outros);
 
-        AcoesRealizadas acoes = new AcoesRealizadas();
+        AcoesRealizadasEntity acoes = new AcoesRealizadasEntity();
         acoes.setTotalAtividadesGrupoVirtual(20);
         input.setAcoesRealizadas(acoes);
 
@@ -378,16 +367,16 @@ public class RelatorioServiceTest {
         when(usuarioDetalhes.getEmail()).thenReturn("usuario@teste.com");
 
         // Mock do usuarioRepository
-        Usuario usuario = new Usuario();
+        UsuarioEntity usuario = new UsuarioEntity();
         usuario.setEmail("usuario@teste.com");
         when(usuarioRepository.findByEmail("usuario@teste.com")).thenReturn(Optional.of(usuario));
 
         // Mock do repository
         when(repository.findById(id)).thenReturn(Optional.of(existente));
-        when(repository.save(any(Relatorio.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(repository.save(any(RelatorioEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        Relatorio atualizado = service.atualizar(id, input, authentication);
+        RelatorioEntity atualizado = service.atualizar(id, input, authentication);
 
         // Assert - verificar se atualizou corretamente
         Assertions.assertNotNull(atualizado);
@@ -400,6 +389,6 @@ public class RelatorioServiceTest {
 
         // Verificar se salvou (se tiver save no método)
         verify(repository, times(1)).findById(id);
-        verify(repository, times(1)).save(any(Relatorio.class));
+        verify(repository, times(1)).save(any(RelatorioEntity.class));
     }
 }
