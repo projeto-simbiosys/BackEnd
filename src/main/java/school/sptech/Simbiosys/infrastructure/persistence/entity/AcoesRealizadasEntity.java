@@ -3,6 +3,7 @@ package school.sptech.Simbiosys.infrastructure.persistence.entity;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "acoes_realizadas")
 public class AcoesRealizadasEntity {
 
     @Id

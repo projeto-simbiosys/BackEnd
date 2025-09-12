@@ -1,9 +1,11 @@
 package school.sptech.Simbiosys.core.application.usecase;
 
+import org.springframework.stereotype.Service;
 import school.sptech.Simbiosys.core.adapter.RelatorioGateway;
 import school.sptech.Simbiosys.core.application.exception.EntidadeNaoEncontradaException;
 import school.sptech.Simbiosys.infrastructure.persistence.entity.RelatorioEntity;
 
+@Service
 public class BuscarRelatorioPorIdUseCase {
 
     private final RelatorioGateway gateway;

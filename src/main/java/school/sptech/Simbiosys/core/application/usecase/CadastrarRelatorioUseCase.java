@@ -2,6 +2,7 @@ package school.sptech.Simbiosys.core.application.usecase;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
 import school.sptech.Simbiosys.core.adapter.RelatorioGateway;
 import school.sptech.Simbiosys.core.application.exception.EntidadeJaExistente;
 import school.sptech.Simbiosys.infrastructure.event.RelatorioCriadoEvent;
@@ -9,6 +10,7 @@ import school.sptech.Simbiosys.infrastructure.persistence.entity.RelatorioEntity
 import school.sptech.Simbiosys.infrastructure.persistence.entity.UsuarioEntity;
 import school.sptech.Simbiosys.infrastructure.persistence.repository.RelatorioRepository;
 
+@Service
 public class CadastrarRelatorioUseCase {
 
     private final RelatorioGateway gateway;

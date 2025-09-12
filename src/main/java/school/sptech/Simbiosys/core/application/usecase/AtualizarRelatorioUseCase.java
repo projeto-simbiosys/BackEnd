@@ -1,12 +1,14 @@
 package school.sptech.Simbiosys.core.application.usecase;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
 import school.sptech.Simbiosys.core.adapter.RelatorioGateway;
 import school.sptech.Simbiosys.core.application.exception.EntidadeNaoEncontradaException;
 import school.sptech.Simbiosys.infrastructure.persistence.entity.*;
 
 import java.time.LocalDateTime;
 
+@Service
 public class AtualizarRelatorioUseCase {
 
     private final PegarUsuarioAutenticadoUseCase pegarUsuarioAutenticadoUseCase;

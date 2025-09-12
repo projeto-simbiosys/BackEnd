@@ -1,9 +1,10 @@
 package school.sptech.Simbiosys.core.application.usecase;
 
+import org.springframework.stereotype.Service;
 import school.sptech.Simbiosys.core.adapter.RelatorioGateway;
 import school.sptech.Simbiosys.core.application.exception.EntidadeNaoEncontradaException;
 
-
+@Service
 public class DeletarRelatorioUseCase {
 
     private final RelatorioGateway gateway;

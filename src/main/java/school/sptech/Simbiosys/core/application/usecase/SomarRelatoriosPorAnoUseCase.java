@@ -1,11 +1,13 @@
 package school.sptech.Simbiosys.core.application.usecase;
 
+import org.springframework.stereotype.Service;
 import school.sptech.Simbiosys.core.adapter.RelatorioGateway;
 import school.sptech.Simbiosys.infrastructure.persistence.entity.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Service
 public class SomarRelatoriosPorAnoUseCase {
 
     private final RelatorioGateway gateway;
