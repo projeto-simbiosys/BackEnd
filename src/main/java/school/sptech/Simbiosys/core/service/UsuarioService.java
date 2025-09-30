@@ -6,6 +6,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -123,11 +124,14 @@ public class UsuarioService {
             return Optional.empty();
         }
         UsuarioEntity usuario = usuarioOpt.get();
+
+        String encryptedPassword = new BCryptPasswordEncoder().encode(dto.getSenha());
+
         usuario.setNome(dto.getNome());
         usuario.setSobrenome(dto.getSobrenome());
         usuario.setCargo(dto.getCargo());
         usuario.setEmail(dto.getEmail());
-        usuario.setSenha(dto.getSenha());
+        usuario.setSenha(encriptandoSenha(dto.getSenha()));
 
         UsuarioEntity salvo = usuarioRepository.save(usuario);
         return Optional.of(new UsuarioResponseDto(salvo));
@@ -160,9 +164,13 @@ public class UsuarioService {
         }
 
         UsuarioEntity usuario = usuarioOpt.get();
-        usuario.setSenha(novaSenha);
+        usuario.setSenha(encriptandoSenha(novaSenha));
         usuarioRepository.save(usuario);
         return true;
     }
 
+    public static String encriptandoSenha(String senha){
+        String encryptedPassword = new BCryptPasswordEncoder().encode(senha);
+        return encryptedPassword;
+    }
 }

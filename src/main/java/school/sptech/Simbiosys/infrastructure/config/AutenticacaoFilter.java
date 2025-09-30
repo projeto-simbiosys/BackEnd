@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
+import school.sptech.Simbiosys.core.application.usecase.usuarioUseCase.AutenticacaoUseCase;
 import school.sptech.Simbiosys.core.service.AutenticacaoService;
 
 import java.io.IOException;
@@ -21,12 +22,13 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AutenticacaoFilter.class);
 
-    private final AutenticacaoService autenticacaoService;
+    private final AutenticacaoUseCase autenticacaoUseCase;
+//    private final AutenticacaoService autenticacaoService;
 
     private final GerenciadorTokenJwt jwtTokenManager;
 
-    public AutenticacaoFilter(AutenticacaoService autenticacaoService, GerenciadorTokenJwt jwtTokenManager) {
-        this.autenticacaoService = autenticacaoService;
+    public AutenticacaoFilter(AutenticacaoUseCase autenticacaoUseCase, GerenciadorTokenJwt jwtTokenManager) {
+        this.autenticacaoUseCase = autenticacaoUseCase;
         this.jwtTokenManager = jwtTokenManager;
     }
 
@@ -63,7 +65,7 @@ public class AutenticacaoFilter extends OncePerRequestFilter {
 
     private void addUsernameInContext(HttpServletRequest request, String username, String jwtToken) {
 
-        UserDetails userDetails = autenticacaoService.loadUserByUsername(username);
+        UserDetails userDetails = autenticacaoUseCase.loadUserByUsername(username);
 
         if (jwtTokenManager.validateToken(jwtToken, userDetails)) {
 
