@@ -7,15 +7,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import school.sptech.Simbiosys.core.service.AutenticacaoService;
+import school.sptech.Simbiosys.core.application.usecase.usuarioUseCase.AutenticacaoUseCase;
 
 
 public class AutenticacaoProvider implements AuthenticationProvider {
 
-    private final AutenticacaoService usuarioAutorizacaoService;
+    private final AutenticacaoUseCase usuarioAutorizacaoService;
     private final PasswordEncoder passwordEncoder;
 
-    public AutenticacaoProvider(AutenticacaoService usuarioAutorizacaoService, PasswordEncoder passwordEncoder) {
+    public AutenticacaoProvider(AutenticacaoUseCase usuarioAutorizacaoService, PasswordEncoder passwordEncoder) {
         this.usuarioAutorizacaoService = usuarioAutorizacaoService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -26,7 +26,7 @@ public class AutenticacaoProvider implements AuthenticationProvider {
         final String username = authentication.getName();
         final String password = authentication.getCredentials().toString();
 
-        UserDetails userDetails = this.usuarioAutorizacaoService.loadUserByUsername(username);
+        UserDetails userDetails = usuarioAutorizacaoService.loadUserByUsername(username);
 
         if (this.passwordEncoder.matches(password, userDetails.getPassword())) {
             return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

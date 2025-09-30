@@ -1,0 +1,59 @@
+package school.sptech.Simbiosys.infrastructure.gateway;
+
+import org.springframework.stereotype.Component;
+import school.sptech.Simbiosys.core.adapter.UsuarioGateway;
+import school.sptech.Simbiosys.infrastructure.persistence.entity.UsuarioEntity;
+import school.sptech.Simbiosys.infrastructure.persistence.repository.UsuarioRepository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Component
+public class UsuarioGatewayImpl implements UsuarioGateway {
+
+    private final UsuarioRepository repository;
+
+    public UsuarioGatewayImpl(UsuarioRepository repository) {
+        this.repository = repository;
+    }
+
+    @Override
+    public UsuarioEntity save(UsuarioEntity usuario) {
+        return repository.save(usuario);
+    }
+
+    @Override
+    public Optional<UsuarioEntity> findByEmail(String email) {
+        return repository.findByEmail(email);
+    }
+
+    @Override
+    public Optional<UsuarioEntity> findById(Integer id) {
+        return repository.findById(id);
+    }
+
+    @Override
+    public boolean existsById(Integer id) {
+        return repository.existsById(id);
+    }
+
+    @Override
+    public void deleteById(Integer id) {
+        repository.deleteById(id);
+    }
+
+    @Override
+    public List<UsuarioEntity> findAll() {
+        return repository.findAll();
+    }
+
+    @Override
+    public boolean existsByEmailIgnoreCaseContaining(String email) {
+        return repository.existsByEmailIgnoreCaseContaining(email);
+    }
+
+    @Override
+    public List<UsuarioEntity> findByNomeContainingIgnoreCase(String nome) {
+        return repository.findByNomeContainingIgnoreCase(nome);
+    }
+}

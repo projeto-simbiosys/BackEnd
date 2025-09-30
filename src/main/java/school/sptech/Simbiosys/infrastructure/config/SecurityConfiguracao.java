@@ -22,8 +22,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import school.sptech.Simbiosys.core.service.AutenticacaoService;
-
+import school.sptech.Simbiosys.core.application.usecase.usuarioUseCase.AutenticacaoUseCase;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,7 +32,7 @@ import java.util.List;
 public class SecurityConfiguracao {
 
     @Autowired
-    private AutenticacaoService autenticacaoService;
+    private AutenticacaoUseCase autenticacaoUseCase;
 
     @Autowired
     private AutenticacaoEntryPoint autenticacaoJwtEntryPoint;
@@ -84,7 +83,7 @@ public class SecurityConfiguracao {
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder =
                 http.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.authenticationProvider(new AutenticacaoProvider(autenticacaoService, passwordEncoder()));
+        authenticationManagerBuilder.authenticationProvider(new AutenticacaoProvider(autenticacaoUseCase, passwordEncoder()));
         return authenticationManagerBuilder.build();
     }
 
@@ -95,7 +94,7 @@ public class SecurityConfiguracao {
 
     @Bean
     public AutenticacaoFilter jwtAuthenticationFilterBean() {
-        return new AutenticacaoFilter(autenticacaoService, jwtAuthenticationUtilBean());
+        return new AutenticacaoFilter(autenticacaoUseCase, jwtAuthenticationUtilBean());
     }
 
     @Bean
