@@ -2,6 +2,7 @@ package school.sptech.Simbiosys.core.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import school.sptech.Simbiosys.core.dto.UsuarioDetalhesDto;
@@ -145,44 +146,44 @@ public class RelatorioService {
         return repository.findByMesAno(mesAno);
     }
 
-    public RelatorioEntity somarRelatoriosPorAno(String ano) {
-        List<RelatorioEntity> relatorios = repository.findByAno(ano);
-
-        if (relatorios.isEmpty()) {
-            return null;
-        }
-
-        RelatorioEntity relatorioSomado = new RelatorioEntity();
-        relatorioSomado.setMesAno("Ano " + ano);
-        relatorioSomado.setDataAtualizacao(LocalDateTime.now());
-        relatorioSomado.setUsuario(null);
-        EncaminhamentoEntity encaminhamentoTotal = new EncaminhamentoEntity();
-        OutrosNumerosEntity outrosNumerosEntityTotal = new OutrosNumerosEntity();
-        AcoesRealizadasEntity acoesRealizadasTotal = new AcoesRealizadasEntity();
-
-        for (RelatorioEntity r : relatorios) {
-            EncaminhamentoEntity e = r.getEncaminhamento();
-            if (e != null) {
-                encaminhamentoTotal.somar(e);
-            }
-
-            OutrosNumerosEntity o = r.getOutrosNumeros();
-            if (o != null) {
-                outrosNumerosEntityTotal.somar(o);
-            }
-
-            AcoesRealizadasEntity a = r.getAcoesRealizadas();
-            if (a != null) {
-                acoesRealizadasTotal.somar(a);
-            }
-        }
-
-        relatorioSomado.setEncaminhamento(encaminhamentoTotal);
-        relatorioSomado.setOutrosNumeros(outrosNumerosEntityTotal);
-        relatorioSomado.setAcoesRealizadas(acoesRealizadasTotal);
-
-        return relatorioSomado;
-    }
+//    public RelatorioEntity somarRelatoriosPorAno(String ano, Pageable pageable) {
+//        List<RelatorioEntity> relatorios = repository.findByAno(ano, pageable);
+//
+//        if (relatorios.isEmpty()) {
+//            return null;
+//        }
+//
+//        RelatorioEntity relatorioSomado = new RelatorioEntity();
+//        relatorioSomado.setMesAno("Ano " + ano);
+//        relatorioSomado.setDataAtualizacao(LocalDateTime.now());
+//        relatorioSomado.setUsuario(null);
+//        EncaminhamentoEntity encaminhamentoTotal = new EncaminhamentoEntity();
+//        OutrosNumerosEntity outrosNumerosEntityTotal = new OutrosNumerosEntity();
+//        AcoesRealizadasEntity acoesRealizadasTotal = new AcoesRealizadasEntity();
+//
+//        for (RelatorioEntity r : relatorios) {
+//            EncaminhamentoEntity e = r.getEncaminhamento();
+//            if (e != null) {
+//                encaminhamentoTotal.somar(e);
+//            }
+//
+//            OutrosNumerosEntity o = r.getOutrosNumeros();
+//            if (o != null) {
+//                outrosNumerosEntityTotal.somar(o);
+//            }
+//
+//            AcoesRealizadasEntity a = r.getAcoesRealizadas();
+//            if (a != null) {
+//                acoesRealizadasTotal.somar(a);
+//            }
+//        }
+//
+//        relatorioSomado.setEncaminhamento(encaminhamentoTotal);
+//        relatorioSomado.setOutrosNumeros(outrosNumerosEntityTotal);
+//        relatorioSomado.setAcoesRealizadas(acoesRealizadasTotal);
+//
+//        return relatorioSomado;
+//    }
 
     public RelatorioEntity somarRelatoriosPorPeriodo(String de, String para) {
         List<RelatorioEntity> relatorios = repository.findByPeriodo(de, para);
@@ -203,9 +204,9 @@ public class RelatorioService {
         return relatorioSomado;
     }
 
-    public List<RelatorioEntity> buscarRelatoriosPorAno(String ano) {
-        return repository.findByAno(ano);
-    }
+//    public List<RelatorioEntity> buscarRelatoriosPorAno(String ano) {
+//        return repository.findByAno(ano);
+//    }
 
     public List<RelatorioEntity> buscarRelatoriosPorPeriodo(String de, String para) {
         return repository.findByPeriodo(de, para);

@@ -6,9 +6,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import school.sptech.Simbiosys.core.application.usecase.SomarRelatoriosPorAnoUseCase;
 import school.sptech.Simbiosys.core.service.RelatorioService;
 import school.sptech.Simbiosys.core.dto.UsuarioDetalhesDto;
 import school.sptech.Simbiosys.core.application.exception.EntidadeJaExistente;
@@ -28,6 +30,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class RelatorioServiceTest {
 
+    @InjectMocks
+    private SomarRelatoriosPorAnoUseCase somarRelatoriosPorAnoUseCase;
     @InjectMocks
     private RelatorioService service;
     @Mock
@@ -166,9 +170,9 @@ public class RelatorioServiceTest {
     @Test
     @DisplayName("Somar relatórios por ano quando não existem relatórios deve retornar nulo")
     void somarRelatoriosPorAnoQuandoNaoExistemRelatoriosDeveRetornarNuloTest() {
-        when(repository.findByAno("2025")).thenReturn(Collections.emptyList());
+        when(repository.findByAno("2025", Pageable.unpaged())).thenReturn(Collections.emptyList());
 
-        RelatorioEntity resultado = service.somarRelatoriosPorAno("2025");
+        RelatorioEntity resultado = somarRelatoriosPorAnoUseCase.execute("2025");
 
         assertNull(resultado);
     }

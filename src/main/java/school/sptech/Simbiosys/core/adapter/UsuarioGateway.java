@@ -1,5 +1,7 @@
 package school.sptech.Simbiosys.core.adapter;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import school.sptech.Simbiosys.infrastructure.persistence.entity.UsuarioEntity;
 
 import java.util.List;
@@ -8,7 +10,7 @@ import java.util.Optional;
 public interface UsuarioGateway {
 
     UsuarioEntity save(UsuarioEntity usuario);
-    List<UsuarioEntity> findAll();
+    Page<UsuarioEntity> findAll(Pageable pageable);
     Optional<UsuarioEntity> findByEmail(String email);
     boolean existsByEmailIgnoreCaseContaining(String email);
     List<UsuarioEntity> findByNomeContainingIgnoreCase(String nome);

@@ -1,5 +1,7 @@
 package school.sptech.Simbiosys.core.application.usecase;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import school.sptech.Simbiosys.core.adapter.RelatorioGateway;
 import school.sptech.Simbiosys.infrastructure.persistence.entity.RelatorioEntity;
@@ -15,7 +17,7 @@ public class BuscarRelatoriosPorAnoUseCase {
         this.gateway = gateway;
     }
 
-    public List<RelatorioEntity> execute(String ano) {
-        return gateway.findByAno(ano);
+    public Page<RelatorioEntity> execute(String ano, Pageable pageable) {
+        return gateway.findByAno(ano, pageable);
     }
 }

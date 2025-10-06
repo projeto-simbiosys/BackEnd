@@ -1,5 +1,7 @@
 package school.sptech.Simbiosys.core.adapter;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import school.sptech.Simbiosys.infrastructure.persistence.entity.RelatorioEntity;
 
 import java.util.List;
@@ -13,6 +15,6 @@ public interface RelatorioGateway {
     boolean existsById(Integer id);
     void deleteById(Integer id);
     RelatorioEntity findByMesAno(String mesAno);
-    List<RelatorioEntity> findByAno(String ano);
+    Page<RelatorioEntity> findByAno(String ano, Pageable pageable);
     List<RelatorioEntity> findByPeriodo(String de, String para);
 }
