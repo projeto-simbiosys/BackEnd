@@ -1,5 +1,7 @@
 package school.sptech.Simbiosys.infrastructure.gateway;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import school.sptech.Simbiosys.core.adapter.UsuarioGateway;
 import school.sptech.Simbiosys.infrastructure.persistence.entity.UsuarioEntity;
@@ -43,8 +45,8 @@ public class UsuarioGatewayImpl implements UsuarioGateway {
     }
 
     @Override
-    public List<UsuarioEntity> findAll() {
-        return repository.findAll();
+    public Page<UsuarioEntity> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
     @Override

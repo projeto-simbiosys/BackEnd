@@ -1,13 +1,12 @@
 package school.sptech.Simbiosys.core.application.usecase.usuarioUseCase;
 
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import school.sptech.Simbiosys.core.adapter.UsuarioGateway;
 import school.sptech.Simbiosys.core.dto.UsuarioMapper;
 import school.sptech.Simbiosys.core.dto.UsuarioResponseDto;
 import school.sptech.Simbiosys.infrastructure.persistence.entity.UsuarioEntity;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class ListarUsuariosUseCase {
@@ -19,8 +18,8 @@ public class ListarUsuariosUseCase {
         this.gateway = gateway;
     }
 
-    public List<UsuarioResponseDto> execute() {
-        List<UsuarioEntity> usuariosEncontrados = gateway.findAll();
-        return usuariosEncontrados.stream().map(UsuarioMapper::of).toList();
+    public Page<UsuarioResponseDto> execute(Pageable pageable) {
+        Page<UsuarioEntity> usuariosEncontrados = gateway.findAll(pageable);
+        return usuariosEncontrados.map(UsuarioMapper::of);
     }
 }

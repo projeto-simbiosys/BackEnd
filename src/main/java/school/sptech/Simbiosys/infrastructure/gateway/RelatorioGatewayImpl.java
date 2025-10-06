@@ -1,5 +1,7 @@
 package school.sptech.Simbiosys.infrastructure.gateway;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import school.sptech.Simbiosys.core.adapter.RelatorioGateway;
 import school.sptech.Simbiosys.infrastructure.persistence.entity.RelatorioEntity;
@@ -48,8 +50,8 @@ public class RelatorioGatewayImpl implements RelatorioGateway {
     }
 
     @Override
-    public List<RelatorioEntity> findByAno(String ano) {
-        return repository.findByAno(ano);
+    public Page<RelatorioEntity> findByAno(String ano, Pageable pageable) {
+        return repository.findByAno(ano, pageable);
     }
 
     @Override

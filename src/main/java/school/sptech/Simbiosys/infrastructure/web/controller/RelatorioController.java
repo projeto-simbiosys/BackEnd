@@ -1,5 +1,9 @@
 package school.sptech.Simbiosys.infrastructure.web.controller;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import school.sptech.Simbiosys.core.application.usecase.*;
 import school.sptech.Simbiosys.infrastructure.persistence.file.RelatorioExcelAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,13 +70,30 @@ public class RelatorioController {
     }
 
     @GetMapping("/ano/{ano}/listar")
-    public ResponseEntity<List<RelatorioEntity>> listar(@PathVariable String ano) {
-        List<RelatorioEntity> relatorios = buscarRelatoriosPorAnoUseCase.execute(ano);
+    public ResponseEntity<Page<RelatorioEntity>> listar(
+            @PathVariable String ano,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ) {
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                direction.equalsIgnoreCase("asc")
+                        ? Sort.by(sortBy).ascending()
+                        : Sort.by(sortBy).descending()
+        );
+
+        Page<RelatorioEntity> relatorios = buscarRelatoriosPorAnoUseCase.execute(ano, pageable);
+
         if (relatorios.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
+
         return ResponseEntity.ok(relatorios);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<RelatorioEntity> buscarPorId(@PathVariable Integer id) {
