@@ -140,7 +140,7 @@ public class RelatorioController {
 
     @GetMapping("/exportar/ano/{ano}")
     public ResponseEntity<String> exportarPorAno(@PathVariable String ano) throws IOException {
-        List<RelatorioEntity> relatorios = buscarRelatoriosPorAnoUseCase.execute(ano);
+        List<RelatorioEntity> relatorios = buscarRelatoriosPorAnoUseCase.execute(ano, Pageable.unpaged()).getContent();
         String nomeArquivo = "relatorio_ano_" + ano + ".xlsx";
         RelatorioExcelAdapter.gerarRelatorioExcel(relatorios, nomeArquivo);
         String urlDownload = "/relatorios/download/" + nomeArquivo;
