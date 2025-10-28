@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import school.sptech.Simbiosys.core.application.usecase.*;
+import school.sptech.Simbiosys.infrastructure.messaging.RelatorioProducer;
 import school.sptech.Simbiosys.infrastructure.persistence.file.RelatorioExcelAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -29,6 +30,9 @@ import java.util.List;
 @CrossOrigin(origins = "${cors.allowed.origin}")
 public class RelatorioController {
 
+
+    @Autowired
+    private RelatorioProducer relatorioProducer;
 
     @Autowired
     private CadastrarRelatorioUseCase cadastrarRelatorioUseCase;
@@ -61,6 +65,11 @@ public class RelatorioController {
         try {
             RelatorioEntity relatorioSalvo = cadastrarRelatorioUseCase.execute(relatorio, authentication);
             RelatorioResponseDto relatorioResponseDto = new RelatorioResponseDto(relatorioSalvo);
+
+            // Envia mensagem ao RabbitMQ
+            String mensagem = String.format("Novo relatório criado: ID=%d, Ano=%s", relatorioSalvo.getId(), relatorioSalvo.getMesAno());
+            relatorioProducer.enviarMensagem(mensagem);
+
             return ResponseEntity.status(201).body(relatorioResponseDto);
         } catch (DadosInvalidosException e) {
             return ResponseEntity.status(400).build();
@@ -68,6 +77,7 @@ public class RelatorioController {
             return ResponseEntity.status(409).build();
         }
     }
+
 
     @GetMapping("/ano/{ano}/listar")
     public ResponseEntity<Page<RelatorioEntity>> listar(
@@ -140,7 +150,7 @@ public class RelatorioController {
 
     @GetMapping("/exportar/ano/{ano}")
     public ResponseEntity<String> exportarPorAno(@PathVariable String ano) throws IOException {
-        List<RelatorioEntity> relatorios = buscarRelatoriosPorAnoUseCase.execute(ano);
+        List<RelatorioEntity> relatorios = buscarRelatoriosPorAnoUseCase.execute(ano, Pageable.unpaged()).getContent();
         String nomeArquivo = "relatorio_ano_" + ano + ".xlsx";
         RelatorioExcelAdapter.gerarRelatorioExcel(relatorios, nomeArquivo);
         String urlDownload = "/relatorios/download/" + nomeArquivo;
