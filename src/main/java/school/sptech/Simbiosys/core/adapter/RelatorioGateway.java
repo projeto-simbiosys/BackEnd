@@ -17,4 +17,5 @@ public interface RelatorioGateway {
     RelatorioEntity findByMesAno(String mesAno);
     Page<RelatorioEntity> findByAno(String ano, Pageable pageable);
     List<RelatorioEntity> findByPeriodo(String de, String para);
+    Page<RelatorioEntity> findAll(Pageable pageable);
 }
