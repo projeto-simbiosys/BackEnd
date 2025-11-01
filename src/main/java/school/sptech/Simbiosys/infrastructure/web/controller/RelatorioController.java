@@ -30,7 +30,6 @@ import java.util.List;
 @CrossOrigin(origins = "${cors.allowed.origin}")
 public class RelatorioController {
 
-
     @Autowired
     private RelatorioProducer relatorioProducer;
 
@@ -66,9 +65,14 @@ public class RelatorioController {
             RelatorioEntity relatorioSalvo = cadastrarRelatorioUseCase.execute(relatorio, authentication);
             RelatorioResponseDto relatorioResponseDto = new RelatorioResponseDto(relatorioSalvo);
 
-            // Envia mensagem ao RabbitMQ
-            String mensagem = String.format("Novo relatório criado: ID=%d, Ano=%s", relatorioSalvo.getId(), relatorioSalvo.getMesAno());
-            relatorioProducer.enviarMensagem(mensagem);
+            // 🔔 Envia mensagem ao RabbitMQ avisando que um novo relatório foi criado
+            String mensagem = String.format(
+                    "Novo relatório criado!\nID: %d\nPeríodo: %s\nUsuário: %s",
+                    relatorioSalvo.getId(),
+                    relatorioSalvo.getMesAno(),
+                    authentication.getName()
+            );
+            relatorioProducer.enviarRelatorioCriado(relatorioSalvo);
 
             return ResponseEntity.status(201).body(relatorioResponseDto);
         } catch (DadosInvalidosException e) {
@@ -77,7 +81,6 @@ public class RelatorioController {
             return ResponseEntity.status(409).build();
         }
     }
-
 
     @GetMapping("/ano/{ano}/listar")
     public ResponseEntity<Page<RelatorioEntity>> listar(
@@ -103,7 +106,6 @@ public class RelatorioController {
 
         return ResponseEntity.ok(relatorios);
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<RelatorioEntity> buscarPorId(@PathVariable Integer id) {
@@ -157,7 +159,6 @@ public class RelatorioController {
         return ResponseEntity.ok(urlDownload);
     }
 
-    ///relatorios/exportar/mes?mesAno=01/2025
     @GetMapping("/exportar/mes")
     public ResponseEntity<String> exportarPorMes(@RequestParam String mesAno) throws IOException {
         List<RelatorioEntity> relatorios = buscarRelatoriosPorPeriodoUs.execute(mesAno, mesAno);
@@ -179,8 +180,6 @@ public class RelatorioController {
         return ResponseEntity.ok(urlDownload);
     }
 
-    // ========= FLUXO 2 - DOWNLOAD =========
-
     @GetMapping("/download/{nomeArquivo}")
     public ResponseEntity<InputStreamResource> downloadRelatorio(@PathVariable String nomeArquivo) throws IOException {
         File arquivo = new File(CAMINHO_PASTA + nomeArquivo);
@@ -199,3 +198,4 @@ public class RelatorioController {
                 .body(resource);
     }
 }
+

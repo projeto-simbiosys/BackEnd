@@ -2,23 +2,28 @@ package school.sptech.Simbiosys.infrastructure.messaging;
 
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import school.sptech.Simbiosys.infrastructure.persistence.entity.RelatorioEntity;
 
-@Component
+@Service
 public class RelatorioProducer {
 
     private final RabbitTemplate rabbitTemplate;
 
-    @Value("${rabbitmq.queue.relatorio}")
-    private String queueName;
+    @Value("${broker.exchange.name}")
+    private String exchangeName;
+
+    @Value("${broker.routing.key}")
+    private String routingKey;
 
     public RelatorioProducer(RabbitTemplate rabbitTemplate) {
         this.rabbitTemplate = rabbitTemplate;
     }
 
-    public void enviarMensagem(String mensagem) {
-        rabbitTemplate.convertAndSend(queueName, mensagem);
-        System.out.println("📩 Mensagem enviada para a fila: " + mensagem);
+    public void enviarRelatorioCriado(RelatorioEntity relatorio) {
+        rabbitTemplate.convertAndSend(exchangeName, routingKey, relatorio);
+        System.out.println("📤 Evento publicado: " + relatorio);
     }
 }
+
 
