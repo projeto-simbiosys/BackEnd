@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import school.sptech.Simbiosys.core.application.usecase.*;
+import school.sptech.Simbiosys.infrastructure.messaging.RelatorioProducer;
 import school.sptech.Simbiosys.infrastructure.persistence.file.RelatorioExcelAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
@@ -29,6 +30,8 @@ import java.util.List;
 @CrossOrigin(origins = "${cors.allowed.origin}")
 public class RelatorioController {
 
+    @Autowired
+    private RelatorioProducer relatorioProducer;
 
     @Autowired
     private CadastrarRelatorioUseCase cadastrarRelatorioUseCase;
@@ -64,6 +67,16 @@ public class RelatorioController {
         try {
             RelatorioEntity relatorioSalvo = cadastrarRelatorioUseCase.execute(relatorio, authentication);
             RelatorioResponseDto relatorioResponseDto = new RelatorioResponseDto(relatorioSalvo);
+
+            // 🔔 Envia mensagem ao RabbitMQ avisando que um novo relatório foi criado
+            String mensagem = String.format(
+                    "Novo relatório criado!\nID: %d\nPeríodo: %s\nUsuário: %s",
+                    relatorioSalvo.getId(),
+                    relatorioSalvo.getMesAno(),
+                    authentication.getName()
+            );
+            relatorioProducer.enviarRelatorioCriado(relatorioSalvo);
+
             return ResponseEntity.status(201).body(relatorioResponseDto);
         } catch (DadosInvalidosException e) {
             return ResponseEntity.status(400).build();
@@ -89,30 +102,6 @@ public class RelatorioController {
         );
 
         Page<RelatorioEntity> relatorios = buscarRelatoriosPorAnoUseCase.execute(ano, pageable);
-
-        if (relatorios.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        return ResponseEntity.ok(relatorios);
-    }
-
-    @GetMapping("/listar")
-    public ResponseEntity<Page<RelatorioEntity>> listarTodos(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "24") int size,
-            @RequestParam(defaultValue = "id") String sortBy,
-            @RequestParam(defaultValue = "asc") String direction
-    ) {
-        Pageable pageable = PageRequest.of(
-                page,
-                size,
-                direction.equalsIgnoreCase("asc")
-                        ? Sort.by(sortBy).ascending()
-                        : Sort.by(sortBy).descending()
-        );
-
-        Page<RelatorioEntity> relatorios = buscarRelatoriosUseCase.execute(pageable);
 
         if (relatorios.isEmpty()) {
             return ResponseEntity.noContent().build();
@@ -173,7 +162,6 @@ public class RelatorioController {
         return ResponseEntity.ok(urlDownload);
     }
 
-    ///relatorios/exportar/mes?mesAno=01/2025
     @GetMapping("/exportar/mes")
     public ResponseEntity<String> exportarPorMes(@RequestParam String mesAno) throws IOException {
         List<RelatorioEntity> relatorios = buscarRelatoriosPorPeriodoUs.execute(mesAno, mesAno);
@@ -195,8 +183,6 @@ public class RelatorioController {
         return ResponseEntity.ok(urlDownload);
     }
 
-    // ========= FLUXO 2 - DOWNLOAD =========
-
     @GetMapping("/download/{nomeArquivo}")
     public ResponseEntity<InputStreamResource> downloadRelatorio(@PathVariable String nomeArquivo) throws IOException {
         File arquivo = new File(CAMINHO_PASTA + nomeArquivo);
@@ -215,3 +201,4 @@ public class RelatorioController {
                 .body(resource);
     }
 }
+
