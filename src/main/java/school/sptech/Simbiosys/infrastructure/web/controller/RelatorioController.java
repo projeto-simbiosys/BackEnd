@@ -52,6 +52,9 @@ public class RelatorioController {
     private BuscarRelatoriosPorAnoUseCase buscarRelatoriosPorAnoUseCase;
 
     @Autowired
+    private BuscarRelatoriosUseCase buscarRelatoriosUseCase;
+
+    @Autowired
     private SomarRelatoriosPorAnoUseCase somarRelatoriosPorAnoUseCase;
 
     @Autowired
@@ -86,7 +89,7 @@ public class RelatorioController {
     public ResponseEntity<Page<RelatorioEntity>> listar(
             @PathVariable String ano,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "12") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "asc") String direction
     ) {

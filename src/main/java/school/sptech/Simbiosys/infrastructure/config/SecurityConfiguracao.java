@@ -51,6 +51,7 @@ public class SecurityConfiguracao {
             new AntPathRequestMatcher("/actuator/*"),
             new AntPathRequestMatcher("/usuarios**"),
             new AntPathRequestMatcher("/usuarios/login/**"),
+            new AntPathRequestMatcher("/usuarios/alterar-senha"),
             new AntPathRequestMatcher("/error/**")
     };
 
@@ -81,10 +82,10 @@ public class SecurityConfiguracao {
 
     @Bean
     public AuthenticationManager authManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authenticationManagerBuilder =
-                http.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.authenticationProvider(new AutenticacaoProvider(autenticacaoUseCase, passwordEncoder()));
-        return authenticationManagerBuilder.build();
+        return http.getSharedObject(AuthenticationManagerBuilder.class)
+                .authenticationProvider(new AutenticacaoProvider(autenticacaoUseCase, passwordEncoder()))
+                .parentAuthenticationManager(null)
+                .build();
     }
 
     @Bean

@@ -128,10 +128,9 @@ public class UsuarioController {
         return ResponseEntity.ok(usuario);
     }
 
-    @PatchMapping("/{id}/alterar-senha")
-    public ResponseEntity<Void> alterarSenha(@PathVariable Integer id,
-                                             @RequestBody AlterarSenhaDto dto) {
-        boolean ok = alterarSenhaUsuarioUseCase.execute(id, dto.getNovaSenha());
+    @PatchMapping("/alterar-senha")
+    public ResponseEntity<Void> alterarSenha(@RequestBody AlterarSenhaDto dto) {
+        boolean ok = alterarSenhaUsuarioUseCase.execute(dto.getEmail(), dto.getNovaSenha());
         return ok ? ResponseEntity.noContent().build() : ResponseEntity.badRequest().build();
     }
 }
