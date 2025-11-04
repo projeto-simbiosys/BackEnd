@@ -110,6 +110,30 @@ public class RelatorioController {
         return ResponseEntity.ok(relatorios);
     }
 
+    @GetMapping("/listar")
+    public ResponseEntity<Page<RelatorioEntity>> listarTodos(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "24") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction
+    ) {
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                direction.equalsIgnoreCase("asc")
+                        ? Sort.by(sortBy).ascending()
+                        : Sort.by(sortBy).descending()
+        );
+
+        Page<RelatorioEntity> relatorios = buscarRelatoriosUseCase.execute(pageable);
+
+        if (relatorios.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(relatorios);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<RelatorioEntity> buscarPorId(@PathVariable Integer id) {
         try {
