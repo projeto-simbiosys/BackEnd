@@ -58,4 +58,9 @@ public class RelatorioGatewayImpl implements RelatorioGateway {
     public List<RelatorioEntity> findByPeriodo(String de, String para) {
         return repository.findByPeriodo(de, para);
     }
+
+    @Override
+    public Page<RelatorioEntity> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
+    }
 }

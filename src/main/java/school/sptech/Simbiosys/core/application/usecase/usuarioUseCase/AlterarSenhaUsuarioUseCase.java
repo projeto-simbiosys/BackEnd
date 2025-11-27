@@ -16,12 +16,12 @@ public class AlterarSenhaUsuarioUseCase {
         this.gateway = gateway;
     }
 
-    public boolean execute(Integer id, String novaSenha) {
-        if (id == null || id <= 0 || novaSenha == null || novaSenha.length() < 6) {
+    public boolean execute(String email, String novaSenha) {
+        if (novaSenha == null || novaSenha.length() < 6) {
             return false;
         }
 
-        Optional<UsuarioEntity> usuarioOpt = gateway.findById(id);
+        Optional<UsuarioEntity> usuarioOpt = gateway.findByEmail(email);
         if (usuarioOpt.isEmpty()) {
             return false;
         }
