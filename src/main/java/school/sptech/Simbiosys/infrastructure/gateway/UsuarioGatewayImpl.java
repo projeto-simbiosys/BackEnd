@@ -1,5 +1,8 @@
 package school.sptech.Simbiosys.infrastructure.gateway;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -19,6 +22,7 @@ public class UsuarioGatewayImpl implements UsuarioGateway {
         this.repository = repository;
     }
 
+    @CachePut(cacheNames = "usuarioPorId", key = "#produto.id")
     @Override
     public UsuarioEntity save(UsuarioEntity usuario) {
         return repository.save(usuario);
@@ -29,6 +33,7 @@ public class UsuarioGatewayImpl implements UsuarioGateway {
         return repository.findByEmail(email);
     }
 
+    @Cacheable(cacheNames = "usuarioId", key = "#id")
     @Override
     public Optional<UsuarioEntity> findById(Integer id) {
         return repository.findById(id);
@@ -39,6 +44,7 @@ public class UsuarioGatewayImpl implements UsuarioGateway {
         return repository.existsById(id);
     }
 
+    @CacheEvict(cacheNames = "usuarioId", key = "#id")
     @Override
     public void deleteById(Integer id) {
         repository.deleteById(id);
