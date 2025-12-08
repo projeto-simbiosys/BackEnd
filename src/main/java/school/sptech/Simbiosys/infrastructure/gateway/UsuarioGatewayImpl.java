@@ -22,7 +22,7 @@ public class UsuarioGatewayImpl implements UsuarioGateway {
         this.repository = repository;
     }
 
-    @CachePut(cacheNames = "usuarioPorId", key = "#produto.id")
+    @CachePut(cacheNames = "usuarioPorId", key = "#usuario.id")
     @Override
     public UsuarioEntity save(UsuarioEntity usuario) {
         return repository.save(usuario);
